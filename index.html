@@ -24,27 +24,38 @@
             </div>
             <button type="submit">제출</button>
         </form>
+
+        <div class="discussion-section">
+            <h2>토론 참여하기</h2>
+            <div id="disqus_thread"></div>
+            <script>
+                var disqus_config = function () {
+                    // Disqus often has issues loading with file:/// URLs or on domains not configured as 'Trusted Domains'.
+                    // If testing locally (via file:///), you might encounter issues.
+                    // To resolve:
+                    // 1. Host the page on a local web server (e.g., using 'python -m http.server' or 'npx http-server') and access it via http://localhost:PORT/
+                    // 2. Or, temporarily set this.page.url to a dummy URL (e.g., 'http://example.com/your-page-path')
+                    //    and ensure 'example.com' (or whatever dummy domain you use) is added to your Disqus app's 'Trusted Domains' in the Disqus admin panel.
+                    // 3. Ensure 'product-builder-7' is your correct Disqus shortname and it's properly configured with trusted domains.
+
+                    this.page.url = window.location.href; // Use the current page's URL
+                    this.page.identifier = window.location.href; // Use a unique identifier for the page. URL is often a good choice.
+
+                    // If you decide to set a custom title for the Disqus thread, uncomment and set this:
+                    // this.page.title = document.title; // Ensure this title is ASCII compatible or properly encoded if it contains special characters.
+                };
+                (function() { // DON'T EDIT BELOW THIS LINE
+                    var d = document, s = d.createElement('script');
+                    s.src = 'https://product-builder-7.disqus.com/embed.js';
+                    s.setAttribute('data-timestamp', +new Date());
+                    (d.head || d.body).appendChild(s);
+                })();
+            </script>
+            <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+        </div>
     </div>
     <script src="script.js"></script>
 
-    <div id="disqus_thread"></div>
-    <script>
-        /**
-        *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
-        *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables    */
-        
-        var disqus_config = function () {
-            this.page.url = window.location.href;
-            this.page.identifier = window.location.href;
-        };
-        
-        (function() { // DON'T EDIT BELOW THIS LINE
-        var d = document, s = d.createElement('script');
-        s.src = 'https://product-builder-7.disqus.com/embed.js';
-        s.setAttribute('data-timestamp', +new Date());
-        (d.head || d.body).appendChild(s);
-        })();
-    </script>
-    <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
 </body>
 </html>
