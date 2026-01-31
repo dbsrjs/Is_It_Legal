@@ -1,0 +1,191 @@
+.country-comparison-section {
+  padding: 4rem 0;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+}
+
+.country-comparison-section h2 {
+  text-align: center;
+  font-size: 2.2rem;
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.comparison-description {
+  text-align: center;
+  color: #666;
+  font-size: 1.1rem;
+  margin-bottom: 2.5rem;
+}
+
+.topic-selector {
+  max-width: 500px;
+  margin: 0 auto 3rem;
+  text-align: center;
+}
+
+.topic-selector label {
+  display: block;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.topic-dropdown {
+  width: 100%;
+  padding: 1rem 1.5rem;
+  font-size: 1rem;
+  border: 2px solid #667eea;
+  border-radius: 8px;
+  background: white;
+  color: #333;
+  cursor: pointer;
+  transition: all 0.3s;
+  text-transform: capitalize;
+}
+
+.topic-dropdown:hover {
+  border-color: #764ba2;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+}
+
+.topic-dropdown:focus {
+  outline: none;
+  border-color: #764ba2;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.comparison-table-container {
+  overflow-x: auto;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.comparison-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 800px;
+}
+
+.comparison-table thead {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.comparison-table th {
+  padding: 1.2rem;
+  text-align: left;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.comparison-table tbody tr {
+  border-bottom: 1px solid #e0e0e0;
+  transition: background 0.3s;
+}
+
+.comparison-table tbody tr:hover {
+  background: #f9f9f9;
+}
+
+.comparison-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.comparison-table td {
+  padding: 1.2rem;
+  color: #555;
+}
+
+.country-cell strong {
+  color: #333;
+  font-size: 1.05rem;
+}
+
+.status-cell {
+  min-width: 140px;
+}
+
+.comparison-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-transform: capitalize;
+}
+
+.comparison-status .status-icon {
+  font-size: 1.1rem;
+}
+
+.comparison-status.status-legal {
+  background: #d4edda;
+  color: #155724;
+}
+
+.comparison-status.status-conditional {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.comparison-status.status-illegal {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.comparison-status.status-unclear {
+  background: #e2e3e5;
+  color: #383d41;
+}
+
+.summary-cell {
+  max-width: 400px;
+  line-height: 1.6;
+}
+
+.date-cell {
+  color: #999;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.no-data {
+  text-align: center;
+  padding: 3rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.no-data p {
+  color: #666;
+  font-size: 1.1rem;
+}
+
+@media (max-width: 768px) {
+  .country-comparison-section h2 {
+    font-size: 1.8rem;
+  }
+
+  .comparison-table-container {
+    border-radius: 8px;
+  }
+
+  .comparison-table {
+    font-size: 0.9rem;
+  }
+
+  .comparison-table th,
+  .comparison-table td {
+    padding: 0.8rem;
+  }
+
+  .summary-cell {
+    max-width: 250px;
+    font-size: 0.85rem;
+  }
+}
