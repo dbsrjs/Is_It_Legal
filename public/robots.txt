@@ -2,4 +2,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://lawornot.com/sitemap.xml
+Sitemap: https://www.lawornot.com/sitemap.xml
