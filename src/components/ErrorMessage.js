@@ -1,23 +1,26 @@
 import React from 'react';
+import { useLanguage } from '../contexts/LanguageContext';
 import './ErrorMessage.css';
 
 function ErrorMessage({ message, onRetry }) {
+  const { t } = useLanguage();
+
   return (
     <div className="error-container">
       <div className="error-icon">⚠️</div>
-      <h3 className="error-title">Oops! Something went wrong</h3>
+      <h3 className="error-title">{t.error.title}</h3>
       <p className="error-message">{message}</p>
       {onRetry && (
         <button className="retry-button" onClick={onRetry}>
-          Try Again
+          {t.error.retry}
         </button>
       )}
       <div className="error-tips">
-        <h4>Tips:</h4>
+        <h4>{t.error.tips}</h4>
         <ul>
-          <li>Make sure you include both a topic and country (e.g., "drone Japan")</li>
-          <li>Check your internet connection</li>
-          <li>Try rephrasing your search query</li>
+          <li>{t.error.tip1}</li>
+          <li>{t.error.tip2}</li>
+          <li>{t.error.tip3}</li>
         </ul>
       </div>
     </div>

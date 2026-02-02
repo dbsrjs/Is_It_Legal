@@ -1,17 +1,20 @@
 import React from 'react';
+import { useLanguage } from '../contexts/LanguageContext';
 import './LoadingSpinner.css';
 
-function LoadingSpinner({ message = 'Searching legal information...' }) {
+function LoadingSpinner() {
+  const { t } = useLanguage();
+
   return (
     <div className="loading-container">
       <div className="loading-spinner">
         <div className="spinner"></div>
       </div>
-      <p className="loading-message">{message}</p>
+      <p className="loading-message">{t.loading.title}</p>
       <div className="loading-steps">
-        <div className="loading-step">🔍 Analyzing your query...</div>
-        <div className="loading-step">📚 Searching official sources...</div>
-        <div className="loading-step">🤖 Processing legal information...</div>
+        <div className="loading-step">🔍 {t.loading.analyzing}</div>
+        <div className="loading-step">📚 {t.loading.searching}</div>
+        <div className="loading-step">🤖 {t.loading.processing}</div>
       </div>
     </div>
   );

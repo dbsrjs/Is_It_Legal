@@ -1,0 +1,142 @@
+/* LanguageSelector.css */
+
+.language-selector {
+  position: relative;
+  z-index: 1000;
+}
+
+.language-selector-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.language-selector-button:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-1px);
+}
+
+.language-flag {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.language-name {
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.language-arrow {
+  font-size: 10px;
+  margin-left: 4px;
+  transition: transform 0.3s ease;
+}
+
+.language-arrow.open {
+  transform: rotate(180deg);
+}
+
+.language-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 180px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  animation: dropdownSlideDown 0.3s ease;
+}
+
+@keyframes dropdownSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.language-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 16px;
+  background: white;
+  border: none;
+  color: #333;
+  font-size: 14px;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  position: relative;
+}
+
+.language-option:hover {
+  background: #f5f5f5;
+}
+
+.language-option.active {
+  background: #f0f0ff;
+  color: #667eea;
+  font-weight: 600;
+}
+
+.language-option:not(:last-child) {
+  border-bottom: 1px solid #eee;
+}
+
+.checkmark {
+  margin-left: auto;
+  color: #667eea;
+  font-weight: bold;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .language-selector-button {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+
+  .language-flag {
+    font-size: 18px;
+  }
+
+  .language-name {
+    display: none; /* 모바일에서는 국기만 표시 */
+  }
+
+  .language-arrow {
+    margin-left: 0;
+  }
+
+  .language-dropdown {
+    min-width: 140px;
+  }
+
+  .language-option {
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+}
+
+/* Tablet */
+@media (max-width: 1024px) and (min-width: 769px) {
+  .language-selector-button {
+    padding: 7px 14px;
+  }
+}

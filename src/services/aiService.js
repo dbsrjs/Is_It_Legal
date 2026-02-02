@@ -12,8 +12,15 @@ if (!API_KEY) {
 
 const genAI = new GoogleGenerativeAI(API_KEY);
 
-export const searchLegalInformation = async (query) => {
+export const searchLegalInformation = async (query, language = 'en') => {
   try {
+    // 언어별 응답 지시사항
+    const languageInstructions = {
+      ko: "모든 응답을 한국어로 작성하세요. 법률 용어를 정확하게 번역하고, 한국 독자들이 이해하기 쉽게 설명하세요.",
+      en: "Write all responses in English. Use clear and professional legal terminology.",
+      ja: "すべての回答を日本語で記述してください。法律用語を正確に翻訳し、日本の読者が理解しやすいように説明してください。"
+    };
+
     // 2. 모델 설정
     // - model: "gemini-1.5-flash" (현재 가장 빠르고 안정적인 모델)
     // - responseMimeType: "application/json" (AI가 순수 JSON만 반환하도록 강제)
@@ -28,6 +35,8 @@ export const searchLegalInformation = async (query) => {
     const prompt = `
     You are a legal information assistant for the "Is It Legal?" platform.
     A user is searching for: "${query}"
+
+    LANGUAGE REQUIREMENT: ${languageInstructions[language] || languageInstructions.en}
 
     Please analyze this query and provide legal information in the following JSON format:
 

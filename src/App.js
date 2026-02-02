@@ -5,14 +5,24 @@ import LawDetails from './components/LawDetails';
 import CountryComparison from './components/CountryComparison';
 import LoadingSpinner from './components/LoadingSpinner';
 import ErrorMessage from './components/ErrorMessage';
+import LanguageSelector from './components/LanguageSelector';
+import AboutModal from './components/AboutModal';
+import PrivacyModal from './components/PrivacyModal';
+import CategoryModal from './components/CategoryModal';
+import { useLanguage } from './contexts/LanguageContext';
 import { searchLegalInformation } from './services/aiService';
 
 function App() {
+  const { language, t } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState(null);
   const [showResults, setShowResults] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [isAboutModalOpen, setIsAboutModalOpen] = useState(false);
+  const [isPrivacyModalOpen, setIsPrivacyModalOpen] = useState(false);
+  const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState(null);
 
   const handleSearch = async (e) => {
     if (e) e.preventDefault();
@@ -39,8 +49,8 @@ function App() {
     }, 100);
 
     try {
-      // Call AI service
-      const response = await searchLegalInformation(searchQuery);
+      // Call AI service with current language
+      const response = await searchLegalInformation(searchQuery, language);
 
       if (response.success) {
         setSearchResults([response.data]);
@@ -72,7 +82,7 @@ function App() {
     }, 100);
 
     try {
-      const response = await searchLegalInformation(example);
+      const response = await searchLegalInformation(example, language);
 
       if (response.success) {
         setSearchResults([response.data]);
@@ -92,15 +102,25 @@ function App() {
     handleSearch();
   };
 
+  const handleCategoryClick = (category) => {
+    setSelectedCategory(category);
+    setIsCategoryModalOpen(true);
+  };
+
+  const handleCategorySearchExample = (query) => {
+    handleExampleClick(query);
+  };
+
   return (
     <div className="App">
       <header className="header">
         <div className="container">
-          <h1 className="logo">Is It Legal?</h1>
+          <h1 className="logo">{t.logo}</h1>
           <nav className="nav">
-            <a href="#home">Home</a>
-            <a href="#categories">Categories</a>
-            <a href="#about">About</a>
+            <a href="#home" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>{t.nav.home}</a>
+            <a href="#categories" onClick={(e) => { e.preventDefault(); document.getElementById('categories')?.scrollIntoView({ behavior: 'smooth' }); }}>{t.nav.categories}</a>
+            <a href="#about" onClick={(e) => { e.preventDefault(); setIsAboutModalOpen(true); }}>{t.nav.about}</a>
+            <LanguageSelector />
           </nav>
         </div>
       </header>
@@ -109,12 +129,12 @@ function App() {
         <section className="hero">
           <div className="container">
             <h2 className="hero-title">
-              Find Out If It's Legal
+              {t.hero.title}
               <br />
-              <span className="hero-subtitle">in Any Country</span>
+              <span className="hero-subtitle">{t.hero.subtitle}</span>
             </h2>
             <p className="hero-description">
-              Comprehensive legal information for travelers, digital nomads, and curious minds
+              {t.hero.description}
             </p>
 
             <form className="search-form" onSubmit={handleSearch}>
@@ -122,21 +142,21 @@ function App() {
                 <input
                   type="text"
                   className="search-input"
-                  placeholder="e.g., drone Japan, VPN China, cannabis Germany..."
+                  placeholder={t.hero.searchPlaceholder}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
                 <button type="submit" className="search-button">
-                  Search
+                  {t.hero.searchButton}
                 </button>
               </div>
             </form>
 
             <div className="search-examples">
-              <span>Popular searches:</span>
-              <button onClick={() => handleExampleClick('drone Japan')}>drone Japan</button>
-              <button onClick={() => handleExampleClick('VPN China')}>VPN China</button>
-              <button onClick={() => handleExampleClick('cannabis Germany')}>cannabis Germany</button>
+              <span>{t.hero.popularSearches}</span>
+              <button onClick={() => handleExampleClick(t.hero.examples.drone)}>{t.hero.examples.drone}</button>
+              <button onClick={() => handleExampleClick(t.hero.examples.vpn)}>{t.hero.examples.vpn}</button>
+              <button onClick={() => handleExampleClick(t.hero.examples.cannabis)}>{t.hero.examples.cannabis}</button>
             </div>
           </div>
         </section>
@@ -158,49 +178,49 @@ function App() {
           )}
         </section>
 
-        <section className="categories">
+        <section id="categories" className="categories">
           <div className="container">
-            <h3>Browse by Category</h3>
+            <h3>{t.categories.title}</h3>
             <div className="category-grid">
-              <div className="category-card">
+              <div className="category-card" onClick={() => handleCategoryClick('digital')}>
                 <span className="category-icon">🎮</span>
-                <h4>Digital</h4>
-                <p>VPN, Torrenting, Web Scraping</p>
+                <h4>{t.categories.digital.title}</h4>
+                <p>{t.categories.digital.description}</p>
               </div>
-              <div className="category-card">
+              <div className="category-card" onClick={() => handleCategoryClick('drone')}>
                 <span className="category-icon">🚁</span>
-                <h4>Drone & Photography</h4>
-                <p>Drone Laws, Street Photography</p>
+                <h4>{t.categories.drone.title}</h4>
+                <p>{t.categories.drone.description}</p>
               </div>
-              <div className="category-card">
+              <div className="category-card" onClick={() => handleCategoryClick('gambling')}>
                 <span className="category-icon">🎰</span>
-                <h4>Gambling</h4>
-                <p>Online Casino, Sports Betting</p>
+                <h4>{t.categories.gambling.title}</h4>
+                <p>{t.categories.gambling.description}</p>
               </div>
-              <div className="category-card">
+              <div className="category-card" onClick={() => handleCategoryClick('substances')}>
                 <span className="category-icon">🌿</span>
-                <h4>Substances</h4>
-                <p>Cannabis, CBD, E-cigarettes</p>
+                <h4>{t.categories.substances.title}</h4>
+                <p>{t.categories.substances.description}</p>
               </div>
-              <div className="category-card">
+              <div className="category-card" onClick={() => handleCategoryClick('possessions')}>
                 <span className="category-icon">🔪</span>
-                <h4>Possessions</h4>
-                <p>Knives, Pepper Spray, Tasers</p>
+                <h4>{t.categories.possessions.title}</h4>
+                <p>{t.categories.possessions.description}</p>
               </div>
-              <div className="category-card">
+              <div className="category-card" onClick={() => handleCategoryClick('privacy')}>
                 <span className="category-icon">📞</span>
-                <h4>Privacy</h4>
-                <p>Call Recording, Location Tracking</p>
+                <h4>{t.categories.privacy.title}</h4>
+                <p>{t.categories.privacy.description}</p>
               </div>
-              <div className="category-card">
+              <div className="category-card" onClick={() => handleCategoryClick('traffic')}>
                 <span className="category-icon">🚗</span>
-                <h4>Traffic</h4>
-                <p>DUI Limits, Phone Usage</p>
+                <h4>{t.categories.traffic.title}</h4>
+                <p>{t.categories.traffic.description}</p>
               </div>
-              <div className="category-card">
+              <div className="category-card" onClick={() => handleCategoryClick('business')}>
                 <span className="category-icon">💼</span>
-                <h4>Business</h4>
-                <p>Cryptocurrency, Freelancing</p>
+                <h4>{t.categories.business.title}</h4>
+                <p>{t.categories.business.description}</p>
               </div>
             </div>
           </div>
@@ -210,22 +230,22 @@ function App() {
 
         <section className="how-it-works">
           <div className="container">
-            <h3>How It Works</h3>
+            <h3>{t.howItWorks.title}</h3>
             <div className="steps">
               <div className="step">
                 <div className="step-number">1</div>
-                <h4>Search</h4>
-                <p>Enter an action and country</p>
+                <h4>{t.howItWorks.step1.title}</h4>
+                <p>{t.howItWorks.step1.description}</p>
               </div>
               <div className="step">
                 <div className="step-number">2</div>
-                <h4>Learn</h4>
-                <p>Get instant legal status</p>
+                <h4>{t.howItWorks.step2.title}</h4>
+                <p>{t.howItWorks.step2.description}</p>
               </div>
               <div className="step">
                 <div className="step-number">3</div>
-                <h4>Verify</h4>
-                <p>Check official sources</p>
+                <h4>{t.howItWorks.step3.title}</h4>
+                <p>{t.howItWorks.step3.description}</p>
               </div>
             </div>
           </div>
@@ -236,27 +256,41 @@ function App() {
         <div className="container">
           <div className="footer-content">
             <div className="footer-section">
-              <h4>Is It Legal?</h4>
-              <p>Global legal information platform</p>
+              <h4>{t.footer.title}</h4>
+              <p>{t.footer.description}</p>
             </div>
             <div className="footer-section">
-              <h4>Quick Links</h4>
-              <a href="#about">About</a>
-              <a href="#privacy">Privacy Policy</a>
-              <a href="#contribute">Contribute</a>
+              <h4>{t.footer.quickLinks}</h4>
+              <a href="#about" onClick={(e) => { e.preventDefault(); setIsAboutModalOpen(true); }}>{t.footer.about}</a>
+              <a href="#privacy" onClick={(e) => { e.preventDefault(); setIsPrivacyModalOpen(true); }}>{t.footer.privacy}</a>
+              <a href="#contribute">{t.footer.contribute}</a>
             </div>
             <div className="footer-section">
-              <h4>Disclaimer</h4>
+              <h4>{t.footer.disclaimerTitle}</h4>
               <p className="disclaimer">
-                This website provides general legal information only and is not a substitute for professional legal advice.
+                {t.footer.disclaimerText}
               </p>
             </div>
           </div>
           <div className="footer-bottom">
-            <p>&copy; 2026 Is It Legal? All rights reserved.</p>
+            <p>{t.footer.copyright}</p>
+            <div className="footer-credits">
+              <p>{t.footer.developedBy} <a href="mailto:lyg@lawornot.com"><strong>LYG</strong></a></p>
+              <p>{t.footer.contact} <a href="mailto:support@lawornot.com">support@lawornot.com</a></p>
+            </div>
           </div>
         </div>
       </footer>
+
+      {/* Modals */}
+      <AboutModal isOpen={isAboutModalOpen} onClose={() => setIsAboutModalOpen(false)} />
+      <PrivacyModal isOpen={isPrivacyModalOpen} onClose={() => setIsPrivacyModalOpen(false)} />
+      <CategoryModal
+        isOpen={isCategoryModalOpen}
+        onClose={() => setIsCategoryModalOpen(false)}
+        category={selectedCategory}
+        onSearchExample={handleCategorySearchExample}
+      />
     </div>
   );
 }

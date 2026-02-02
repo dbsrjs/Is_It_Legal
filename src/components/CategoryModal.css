@@ -1,0 +1,75 @@
+/* CategoryModal.css */
+
+.category-modal-description {
+  font-size: 16px;
+  color: #666;
+  margin-bottom: 24px;
+  line-height: 1.6;
+}
+
+.category-examples h3 {
+  color: #667eea;
+  font-size: 20px;
+  margin-bottom: 16px;
+}
+
+.examples-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 12px;
+}
+
+.example-button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  border-radius: 12px;
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: left;
+}
+
+.example-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+}
+
+.example-button:active {
+  transform: translateY(0);
+}
+
+.example-icon {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.example-label {
+  flex: 1;
+  line-height: 1.4;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .examples-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .example-button {
+    padding: 14px;
+    font-size: 13px;
+  }
+
+  .category-modal-description {
+    font-size: 14px;
+  }
+
+  .category-examples h3 {
+    font-size: 18px;
+  }
+}

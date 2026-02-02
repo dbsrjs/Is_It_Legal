@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
+import { useLanguage } from '../contexts/LanguageContext';
 import './CountryComparison.css';
 import { lawsData } from '../data/lawsData';
 
 function CountryComparison() {
+  const { t } = useLanguage();
   const [selectedTopic, setSelectedTopic] = useState('');
 
   // Get unique topics
@@ -33,20 +35,20 @@ function CountryComparison() {
   return (
     <div className="country-comparison-section">
       <div className="container">
-        <h2>Compare Laws Across Countries</h2>
+        <h2>{t.comparison.title}</h2>
         <p className="comparison-description">
-          Select a topic to see how different countries regulate it
+          {t.comparison.description}
         </p>
 
         <div className="topic-selector">
-          <label htmlFor="topic-select">Choose a topic:</label>
+          <label htmlFor="topic-select">{t.comparison.selectTopic}:</label>
           <select
             id="topic-select"
             value={selectedTopic}
             onChange={(e) => setSelectedTopic(e.target.value)}
             className="topic-dropdown"
           >
-            <option value="">-- Select a topic --</option>
+            <option value="">-- {t.comparison.selectTopic} --</option>
             {topics.map(topic => (
               <option key={topic} value={topic}>
                 {topic.replace('-', ' ').toUpperCase()}
@@ -60,10 +62,10 @@ function CountryComparison() {
             <table className="comparison-table">
               <thead>
                 <tr>
-                  <th>Country</th>
-                  <th>Status</th>
-                  <th>Summary</th>
-                  <th>Last Updated</th>
+                  <th>{t.comparison.country}</th>
+                  <th>{t.comparison.status}</th>
+                  <th>{t.comparison.summary}</th>
+                  <th>{t.details.updated}</th>
                 </tr>
               </thead>
               <tbody>
@@ -75,7 +77,7 @@ function CountryComparison() {
                     <td className="status-cell">
                       <span className={getStatusClass(law.status)}>
                         <span className="status-icon">{getStatusIcon(law.status)}</span>
-                        <span>{law.status}</span>
+                        <span>{t.status[law.status]}</span>
                       </span>
                     </td>
                     <td className="summary-cell">

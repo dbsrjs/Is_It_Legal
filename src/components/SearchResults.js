@@ -1,7 +1,10 @@
 import React from 'react';
+import { useLanguage } from '../contexts/LanguageContext';
 import './SearchResults.css';
 
 function SearchResults({ results, query }) {
+  const { t } = useLanguage();
+
   if (!results || results.length === 0) {
     return (
       <div className="search-results-container">
@@ -27,16 +30,7 @@ function SearchResults({ results, query }) {
   };
 
   const getStatusText = (status) => {
-    switch (status) {
-      case 'legal':
-        return 'Legal';
-      case 'conditional':
-        return 'Conditional';
-      case 'illegal':
-        return 'Illegal';
-      default:
-        return 'Unclear';
-    }
+    return t.status[status] || t.status.unclear;
   };
 
   const getStatusClass = (status) => {
@@ -46,7 +40,7 @@ function SearchResults({ results, query }) {
   return (
     <div className="search-results-container">
       <div className="results-header">
-        <h2>Search Results for "{query}"</h2>
+        <h2>{t.results.title} "{query}"</h2>
         <p className="results-count">{results.length} result{results.length !== 1 ? 's' : ''} found</p>
       </div>
 
@@ -55,7 +49,7 @@ function SearchResults({ results, query }) {
           <div key={law.id} className="result-card">
             <div className="result-header">
               <div className="result-title">
-                <h3>{law.topicName} in {law.countryName}</h3>
+                <h3>{law.topicName} {t.results.in} {law.countryName}</h3>
               </div>
               <div className={getStatusClass(law.status)}>
                 <span className="status-icon">{getStatusIcon(law.status)}</span>
@@ -76,13 +70,13 @@ function SearchResults({ results, query }) {
                   }
                 }}
               >
-                View Full Details →
+                {t.results.viewDetails} →
               </button>
             </div>
 
             <div className="result-meta">
               <span className="category-tag">{law.category}</span>
-              <span className="update-date">Updated: {law.updated}</span>
+              <span className="update-date">{t.details.updated} {law.updated}</span>
             </div>
           </div>
         ))}
