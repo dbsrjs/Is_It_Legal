@@ -9,21 +9,22 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 16px;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 8px;
+  padding: 10px 18px;
+  background: rgba(30, 58, 95, 0.3);
+  border: 1px solid rgba(198, 166, 91, 0.3);
+  border-radius: 12px;
   color: white;
   font-size: 14px;
   cursor: pointer;
   transition: all 0.3s ease;
   backdrop-filter: blur(10px);
+  font-weight: 500;
 }
 
 .language-selector-button:hover {
-  background: rgba(255, 255, 255, 0.2);
-  border-color: rgba(255, 255, 255, 0.3);
-  transform: translateY(-1px);
+  background: rgba(198, 166, 91, 0.2);
+  border-color: var(--accent);
+  transform: translateY(-2px);
 }
 
 .language-flag {
@@ -34,12 +35,14 @@
 .language-name {
   font-weight: 500;
   white-space: nowrap;
+  color: white;
 }
 
 .language-arrow {
   font-size: 10px;
   margin-left: 4px;
   transition: transform 0.3s ease;
+  color: var(--text-light);
 }
 
 .language-arrow.open {
@@ -48,14 +51,18 @@
 
 .language-dropdown {
   position: absolute;
-  top: calc(100% + 8px);
+  top: calc(100% + 12px);
   right: 0;
-  min-width: 180px;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  min-width: 200px;
+  background: rgba(10, 14, 26, 0.95);
+  border: 1px solid rgba(198, 166, 91, 0.3);
+  border-radius: 16px;
+  box-shadow:
+    0 10px 40px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(198, 166, 91, 0.2);
   overflow: hidden;
   animation: dropdownSlideDown 0.3s ease;
+  backdrop-filter: blur(20px);
 }
 
 @keyframes dropdownSlideDown {
@@ -74,41 +81,43 @@
   align-items: center;
   gap: 12px;
   width: 100%;
-  padding: 12px 16px;
-  background: white;
+  padding: 14px 18px;
+  background: transparent;
   border: none;
-  color: #333;
+  color: var(--text-light);
   font-size: 14px;
   text-align: left;
   cursor: pointer;
-  transition: background 0.2s ease;
+  transition: all 0.2s ease;
   position: relative;
+  font-family: inherit;
 }
 
 .language-option:hover {
-  background: #f5f5f5;
+  background: rgba(30, 58, 95, 0.3);
+  color: white;
 }
 
 .language-option.active {
-  background: #f0f0ff;
-  color: #667eea;
+  background: rgba(198, 166, 91, 0.2);
+  color: var(--accent);
   font-weight: 600;
 }
 
 .language-option:not(:last-child) {
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--border);
 }
 
 .checkmark {
   margin-left: auto;
-  color: #667eea;
+  color: var(--accent);
   font-weight: bold;
 }
 
 /* Mobile responsive */
 @media (max-width: 768px) {
   .language-selector-button {
-    padding: 6px 12px;
+    padding: 8px 14px;
     font-size: 13px;
   }
 
@@ -125,11 +134,11 @@
   }
 
   .language-dropdown {
-    min-width: 140px;
+    min-width: 160px;
   }
 
   .language-option {
-    padding: 10px 12px;
+    padding: 12px 14px;
     font-size: 13px;
   }
 }
@@ -137,6 +146,6 @@
 /* Tablet */
 @media (max-width: 1024px) and (min-width: 769px) {
   .language-selector-button {
-    padding: 7px 14px;
+    padding: 9px 16px;
   }
 }

@@ -2,13 +2,11 @@ import React, { useState } from 'react';
 import './App.css';
 import SearchResults from './components/SearchResults';
 import LawDetails from './components/LawDetails';
-import CountryComparison from './components/CountryComparison';
 import LoadingSpinner from './components/LoadingSpinner';
 import ErrorMessage from './components/ErrorMessage';
 import LanguageSelector from './components/LanguageSelector';
 import AboutModal from './components/AboutModal';
 import PrivacyModal from './components/PrivacyModal';
-import CategoryModal from './components/CategoryModal';
 import { useLanguage } from './contexts/LanguageContext';
 import { searchLegalInformation } from './services/aiService';
 
@@ -21,8 +19,6 @@ function App() {
   const [error, setError] = useState(null);
   const [isAboutModalOpen, setIsAboutModalOpen] = useState(false);
   const [isPrivacyModalOpen, setIsPrivacyModalOpen] = useState(false);
-  const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState(null);
 
   const handleSearch = async (e) => {
     if (e) e.preventDefault();
@@ -102,15 +98,6 @@ function App() {
     handleSearch();
   };
 
-  const handleCategoryClick = (category) => {
-    setSelectedCategory(category);
-    setIsCategoryModalOpen(true);
-  };
-
-  const handleCategorySearchExample = (query) => {
-    handleExampleClick(query);
-  };
-
   return (
     <div className="App">
       <header className="header">
@@ -118,7 +105,6 @@ function App() {
           <h1 className="logo">{t.logo}</h1>
           <nav className="nav">
             <a href="#home" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>{t.nav.home}</a>
-            <a href="#categories" onClick={(e) => { e.preventDefault(); document.getElementById('categories')?.scrollIntoView({ behavior: 'smooth' }); }}>{t.nav.categories}</a>
             <a href="#about" onClick={(e) => { e.preventDefault(); setIsAboutModalOpen(true); }}>{t.nav.about}</a>
             <LanguageSelector />
           </nav>
@@ -178,55 +164,6 @@ function App() {
           )}
         </section>
 
-        <section id="categories" className="categories">
-          <div className="container">
-            <h3>{t.categories.title}</h3>
-            <div className="category-grid">
-              <div className="category-card" onClick={() => handleCategoryClick('digital')}>
-                <span className="category-icon">🎮</span>
-                <h4>{t.categories.digital.title}</h4>
-                <p>{t.categories.digital.description}</p>
-              </div>
-              <div className="category-card" onClick={() => handleCategoryClick('drone')}>
-                <span className="category-icon">🚁</span>
-                <h4>{t.categories.drone.title}</h4>
-                <p>{t.categories.drone.description}</p>
-              </div>
-              <div className="category-card" onClick={() => handleCategoryClick('gambling')}>
-                <span className="category-icon">🎰</span>
-                <h4>{t.categories.gambling.title}</h4>
-                <p>{t.categories.gambling.description}</p>
-              </div>
-              <div className="category-card" onClick={() => handleCategoryClick('substances')}>
-                <span className="category-icon">🌿</span>
-                <h4>{t.categories.substances.title}</h4>
-                <p>{t.categories.substances.description}</p>
-              </div>
-              <div className="category-card" onClick={() => handleCategoryClick('possessions')}>
-                <span className="category-icon">🔪</span>
-                <h4>{t.categories.possessions.title}</h4>
-                <p>{t.categories.possessions.description}</p>
-              </div>
-              <div className="category-card" onClick={() => handleCategoryClick('privacy')}>
-                <span className="category-icon">📞</span>
-                <h4>{t.categories.privacy.title}</h4>
-                <p>{t.categories.privacy.description}</p>
-              </div>
-              <div className="category-card" onClick={() => handleCategoryClick('traffic')}>
-                <span className="category-icon">🚗</span>
-                <h4>{t.categories.traffic.title}</h4>
-                <p>{t.categories.traffic.description}</p>
-              </div>
-              <div className="category-card" onClick={() => handleCategoryClick('business')}>
-                <span className="category-icon">💼</span>
-                <h4>{t.categories.business.title}</h4>
-                <p>{t.categories.business.description}</p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <CountryComparison />
 
         <section className="how-it-works">
           <div className="container">
@@ -285,12 +222,6 @@ function App() {
       {/* Modals */}
       <AboutModal isOpen={isAboutModalOpen} onClose={() => setIsAboutModalOpen(false)} />
       <PrivacyModal isOpen={isPrivacyModalOpen} onClose={() => setIsPrivacyModalOpen(false)} />
-      <CategoryModal
-        isOpen={isCategoryModalOpen}
-        onClose={() => setIsCategoryModalOpen(false)}
-        category={selectedCategory}
-        onSearchExample={handleCategorySearchExample}
-      />
     </div>
   );
 }

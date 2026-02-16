@@ -6,7 +6,8 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.7);
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -25,15 +26,19 @@
 }
 
 .modal-content {
-  background: white;
-  border-radius: 16px;
+  background: rgba(10, 14, 26, 0.95);
+  border: 1px solid rgba(198, 166, 91, 0.3);
+  border-radius: 24px;
   max-width: 800px;
   width: 100%;
   max-height: 90vh;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(198, 166, 91, 0.2);
   animation: slideUp 0.3s ease;
+  backdrop-filter: blur(20px);
 }
 
 @keyframes slideUp {
@@ -51,48 +56,66 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 24px 32px;
-  border-bottom: 1px solid #e0e0e0;
+  padding: 28px 36px;
+  border-bottom: 1px solid var(--border);
+  position: relative;
+}
+
+.modal-header::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 10%;
+  right: 10%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  opacity: 0.3;
 }
 
 .modal-header h2 {
   margin: 0;
-  font-size: 24px;
-  color: #333;
+  font-size: 1.8rem;
+  color: white;
+  font-weight: 700;
+  letter-spacing: -0.02em;
 }
 
 .modal-close {
-  background: none;
-  border: none;
-  font-size: 28px;
-  color: #666;
+  background: rgba(30, 58, 95, 0.3);
+  border: 1px solid rgba(198, 166, 91, 0.3);
+  font-size: 24px;
+  color: var(--text-light);
   cursor: pointer;
   padding: 0;
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
 }
 
 .modal-close:hover {
-  background: #f5f5f5;
-  color: #333;
+  background: rgba(198, 166, 91, 0.2);
+  border-color: var(--accent);
+  color: var(--accent);
+  transform: rotate(90deg);
 }
 
 .modal-body {
-  padding: 32px;
+  padding: 36px;
   overflow-y: auto;
   flex: 1;
 }
 
 .modal-body h3 {
-  color: #667eea;
-  margin-top: 24px;
-  margin-bottom: 12px;
-  font-size: 20px;
+  color: var(--accent);
+  margin-top: 28px;
+  margin-bottom: 14px;
+  font-size: 1.4rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
 }
 
 .modal-body h3:first-child {
@@ -100,54 +123,60 @@
 }
 
 .modal-body p {
-  color: #555;
-  line-height: 1.7;
-  margin-bottom: 16px;
+  color: var(--text-light);
+  line-height: 1.8;
+  margin-bottom: 18px;
+  font-size: 0.95rem;
 }
 
 .modal-body ul {
-  color: #555;
-  line-height: 1.7;
-  margin-left: 20px;
-  margin-bottom: 16px;
+  color: var(--text-light);
+  line-height: 1.8;
+  margin-left: 24px;
+  margin-bottom: 18px;
 }
 
 .modal-body li {
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 
 .modal-body strong {
-  color: #333;
-  font-weight: 600;
+  color: white;
+  font-weight: 700;
 }
 
 .modal-body a {
-  color: #667eea;
+  color: var(--accent);
   text-decoration: none;
   font-weight: 500;
+  transition: color 0.2s ease;
 }
 
 .modal-body a:hover {
+  color: white;
   text-decoration: underline;
 }
 
-/* 스크롤바 스타일 */
+/* 스크롤바 스타일 - 다크 모드 */
 .modal-body::-webkit-scrollbar {
-  width: 8px;
+  width: 10px;
 }
 
 .modal-body::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: rgba(30, 58, 95, 0.2);
   border-radius: 10px;
 }
 
 .modal-body::-webkit-scrollbar-thumb {
-  background: #888;
+  background: rgba(198, 166, 91, 0.4);
   border-radius: 10px;
+  border: 2px solid transparent;
+  background-clip: content-box;
 }
 
 .modal-body::-webkit-scrollbar-thumb:hover {
-  background: #555;
+  background: rgba(198, 166, 91, 0.6);
+  background-clip: content-box;
 }
 
 /* Mobile responsive */
@@ -160,7 +189,7 @@
   .modal-content {
     max-width: 100%;
     max-height: 95vh;
-    border-radius: 16px 16px 0 0;
+    border-radius: 24px 24px 0 0;
     animation: slideUpMobile 0.3s ease;
   }
 
@@ -174,18 +203,18 @@
   }
 
   .modal-header {
-    padding: 20px;
+    padding: 24px;
   }
 
   .modal-header h2 {
-    font-size: 20px;
+    font-size: 1.5rem;
   }
 
   .modal-body {
-    padding: 20px;
+    padding: 24px;
   }
 
   .modal-body h3 {
-    font-size: 18px;
+    font-size: 1.2rem;
   }
 }
