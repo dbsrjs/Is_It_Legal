@@ -150,6 +150,10 @@ function App() {
             topicName: decoded.t,
             countryName: decoded.c,
             summary: decoded.m,
+            details: decoded.d || '',
+            penalties: decoded.p || '',
+            sources: decoded.u || [],
+            conditions: decoded.n || [],
             topic: decoded.t,
             country: decoded.c,
             category: 'other',
@@ -272,6 +276,10 @@ function App() {
                     country={searchResults[0].countryName}
                     status={searchResults[0].status}
                     summary={searchResults[0].summary}
+                    details={searchResults[0].details}
+                    penalties={searchResults[0].penalties}
+                    sources={searchResults[0].sources}
+                    conditions={searchResults[0].conditions}
                   />
                   {searchResults[0].comparisons && (
                     <CountryComparison comparisons={searchResults[0].comparisons} />
