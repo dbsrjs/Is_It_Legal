@@ -244,13 +244,6 @@ function App() {
               </div>
             </form>
 
-            <div className="search-examples">
-              <span>{t.hero.popularSearches}</span>
-              <button onClick={() => handleExampleClick(t.hero.examples.drone)}>{t.hero.examples.drone}</button>
-              <button onClick={() => handleExampleClick(t.hero.examples.vpn)}>{t.hero.examples.vpn}</button>
-              <button onClick={() => handleExampleClick(t.hero.examples.cannabis)}>{t.hero.examples.cannabis}</button>
-            </div>
-
             <RecentSearches
               searches={recentSearches}
               onSearchClick={handleExampleClick}
