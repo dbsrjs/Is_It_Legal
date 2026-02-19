@@ -8,7 +8,7 @@ function ShareButtons({ query, topic, country, status, summary }) {
 
   const resultData = JSON.stringify({ s: status, t: topic, c: country, m: summary });
   const encoded = btoa(unescape(encodeURIComponent(resultData)));
-  const shareUrl = `${window.location.origin}/?q=${encodeURIComponent(query)}&r=${encoded}`;
+  const shareUrl = `${window.location.origin}/?q=${encodeURIComponent(query)}&r=${encodeURIComponent(encoded)}`;
 
   const getStatusIcon = (s) => {
     switch (s) {
