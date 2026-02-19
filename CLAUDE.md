@@ -7,17 +7,21 @@
 ## 주요 기능
 
 ### 1. 다국어 지원 (Multilingual Support)
-- **지원 언어**: 한국어, English, 日本語
+- **지원 언어**: 한국어, English, 日本語, Español
 - React Context API 기반 언어 전환
 - localStorage를 통한 언어 설정 저장
 - 브라우저 언어 자동 감지
 - AI 응답도 선택된 언어로 제공
+- 동적 document.title 및 meta description 언어별 업데이트
 
 ### 2. AI 기반 법률 검색
-- GEMINI API를 활용한 법률 정보 분석
+- **Gemini API** (`@google/generative-ai`)를 활용한 법률 정보 분석
+- 모델: `gemini-3-flash-preview` (JSON 응답 모드)
 - 실시간 법률 상태 분류 (합법/조건부 합법/불법/불명확)
 - 상세한 법률 설명 및 근거 제시
-- 관련 법률 및 주의사항 안내
+- 5개국 법률 비교 데이터 자동 생성
+- 4개 관련 검색어 자동 추천
+- 비동기 검색 Race Condition 방지 (`searchIdRef` 패턴)
 
 ### 3. 사용자 인터페이스
 - **다크 테마**: Navy (#1E3A5F) & Gold (#C6A65B) 색상 체계
@@ -26,14 +30,29 @@
 - **애니메이션**: 부드러운 hover 효과 및 트랜지션
 - **접근성**: ARIA 레이블 및 키보드 네비게이션 지원
 
-### 4. SEO 최적화
+### 4. 공유 & URL 기반 검색
+- URL 쿼리 파라미터(`?q=`) 기반 공유 가능한 검색 결과
+- `pushState`/`popstate`로 브라우저 뒤로가기/앞으로가기 지원
+- 소셜 미디어 공유 (X, Facebook, Reddit, 링크 복사)
+
+### 5. 추천 시스템
+- **하이브리드 추천**: localStorage 검색 빈도 + 랜덤 풀 선택
+- 첫 방문자: 40개 풀에서 랜덤 10개 표시
+- 재방문자: 개인 상위 5개 + 랜덤 5개 혼합
+- 언어별 40개 추천 항목 풀 (ko/en/ja/es)
+- 한 줄 가로 스크롤 + 양쪽 페이드아웃 효과
+
+### 6. SEO 최적화
 - 메타 태그 최적화 (Open Graph, Twitter Cards)
-- sitemap.xml 및 robots.txt 구성
+- JSON-LD 구조화 데이터 (WebApplication, FAQPage, BreadcrumbList)
+- hreflang 태그 (en, ko, ja, es, x-default)
+- sitemap.xml (25+ URL, 다국어 변형 포함) 및 robots.txt
 - Google Search Console 연동
 - Naver Search Advisor 인증
+- preconnect/dns-prefetch 성능 최적화
 - Cloudflare 301 리디렉션 설정 (lawornot.com → www.lawornot.com)
 
-### 5. 수익화
+### 7. 수익화
 - Google AdSense 통합
 - ads.txt 파일 설정
 - 광고 게재 준비 완료
@@ -41,13 +60,13 @@
 ## 기술 스택
 
 ### Frontend
-- **React** 18.x - UI 라이브러리
+- **React** 19.x - UI 라이브러리
 - **React Context API** - 전역 상태 관리 (언어 설정)
 - **CSS3** - 커스텀 스타일링 (CSS Variables, Flexbox, Grid)
 - **Inter Font** - 웹 폰트
 
 ### Backend/API
-- **Claude API** (Anthropic) - AI 법률 분석
+- **Gemini API** (`@google/generative-ai`) - AI 법률 분석
 
 ### 배포 & 인프라
 - **Cloudflare Pages** - 정적 사이트 호스팅
@@ -63,8 +82,8 @@
 ```
 Is_It_Legal/
 ├── public/
-│   ├── index.html           # 메인 HTML (SEO 메타 태그 포함)
-│   ├── sitemap.xml          # 사이트맵
+│   ├── index.html           # 메인 HTML (SEO 메타 태그, JSON-LD 포함)
+│   ├── sitemap.xml          # 사이트맵 (25+ URL, 다국어 hreflang)
 │   ├── robots.txt           # 크롤러 설정
 │   ├── ads.txt              # Google AdSense 인증
 │   ├── favicon.ico          # 파비콘
@@ -73,22 +92,31 @@ Is_It_Legal/
 │   └── apple-touch-icon.png # iOS 아이콘
 ├── src/
 │   ├── components/
-│   │   ├── SearchResults.js/.css      # 검색 결과 목록
+│   │   ├── SearchResults.js/.css      # 검색 결과 카드
 │   │   ├── LawDetails.js/.css         # 법률 상세 정보
 │   │   ├── LoadingSpinner.js/.css     # 로딩 인디케이터
 │   │   ├── ErrorMessage.js/.css       # 에러 메시지
 │   │   ├── LanguageSelector.js/.css   # 언어 선택기
+│   │   ├── CategoryBrowse.js/.css     # 8개 카테고리 탐색
+│   │   ├── RecentSearches.js/.css     # 최근 검색 기록
+│   │   ├── CountryComparison.js/.css  # 5개국 법률 비교
+│   │   ├── TrendingTopics.js/.css     # 추천 검색 (하이브리드)
+│   │   ├── RelatedSearches.js/.css    # 관련 검색어
+│   │   ├── ShareButtons.js/.css       # 소셜 공유 버튼
+│   │   ├── FAQ.js/.css                # 자주 묻는 질문 (아코디언)
 │   │   ├── Modal.js/.css              # 모달 컴포넌트
 │   │   ├── AboutModal.js              # 소개 모달
 │   │   └── PrivacyModal.js            # 개인정보 처리방침
 │   ├── contexts/
-│   │   └── LanguageContext.js         # 언어 Context
+│   │   └── LanguageContext.js         # 언어 Context (동적 SEO 업데이트)
 │   ├── i18n/
-│   │   └── translations.js            # 번역 데이터
+│   │   └── translations.js            # 번역 데이터 (ko/en/ja/es)
+│   ├── services/
+│   │   └── aiService.js               # Gemini API 연동
 │   ├── App.js                         # 메인 앱 컴포넌트
 │   ├── App.css                        # 글로벌 스타일
 │   └── index.js                       # 엔트리 포인트
-├── .env                               # 환경 변수 (Claude API 키)
+├── .env                               # 환경 변수 (Gemini API 키)
 └── package.json                       # 프로젝트 의존성
 ```
 
@@ -126,12 +154,16 @@ Is_It_Legal/
 ### App.js
 - 메인 애플리케이션 컴포넌트
 - 검색 폼, 결과 표시, 모달 관리
-- Claude API 호출 및 상태 관리
+- Gemini API 호출 및 상태 관리
+- URL 쿼리 파라미터 동기화 (`?q=`)
+- 브라우저 뒤로가기/앞으로가기 (`popstate`) 지원
+- `searchIdRef`를 통한 비동기 Race Condition 방지
 
 ### LanguageContext.js
 - 전역 언어 설정 관리
 - localStorage 동기화
 - 브라우저 언어 감지 (navigator.language)
+- 동적 `document.title`, `document.documentElement.lang`, `meta description` 업데이트
 
 ### SearchResults.js
 - Flexbox 기반 중앙 정렬 레이아웃
@@ -143,6 +175,28 @@ Is_It_Legal/
 - 마크다운 스타일 콘텐츠 렌더링
 - 뒤로가기 버튼
 
+### TrendingTopics.js
+- 하이브리드 추천 시스템 (localStorage 빈도 + 랜덤 풀)
+- 언어별 40개 추천 항목 풀 (`recommendedPool`)
+- 첫 방문자: 랜덤 10개 / 재방문자: 개인 top 5 + 랜덤 5개
+- 한 줄 가로 스크롤 + 양쪽 mask 페이드아웃 효과
+
+### CategoryBrowse.js
+- 8개 카테고리 카드 (디지털, 드론, 도박, 물질, 소지품, 프라이버시, 교통, 비즈니스)
+- 언어별 검색 쿼리 매핑 (`categorySearchQueries`)
+
+### CountryComparison.js
+- AI 응답의 `comparisons` 배열 (5개국) 시각화
+- 법률 상태별 색상 카드
+
+### ShareButtons.js
+- 소셜 미디어 공유 (X, Facebook, Reddit)
+- 클립보드 링크 복사
+
+### FAQ.js
+- 아코디언 UI (ARIA 접근성 지원)
+- 언어별 6개 FAQ 항목
+
 ### Modal.js
 - 재사용 가능한 모달 컴포넌트
 - ESC 키로 닫기
@@ -151,11 +205,13 @@ Is_It_Legal/
 
 ## 환경 변수 설정
 
-`.env` 파일에 다음 변수를 설정해야 합니다:
+`.env` 파일에 다음 변수를 설정해야 합니다 (프로젝트 루트에 위치):
 
 ```env
-REACT_APP_CLAUDE_API_KEY=your_claude_api_key_here
+REACT_APP_GEMINI_API_KEY=your_gemini_api_key_here
 ```
+
+> **주의**: `.env` 파일은 반드시 프로젝트 루트(`Is_It_Legal/`)에 위치해야 합니다. `src/` 폴더 안에 두면 인식되지 않습니다.
 
 ## 설치 및 실행
 
@@ -215,13 +271,14 @@ npm run build
 ## 성능 최적화
 
 ### 빌드 크기
-- **Main JS**: 80.07 kB (gzipped)
-- **Main CSS**: 5.22 kB (gzipped)
-- **Total**: ~85 kB (매우 경량)
+- **Main JS**: ~93 kB (gzipped)
+- **Main CSS**: ~6.7 kB (gzipped)
+- **Chunk**: ~1.8 kB (gzipped)
+- **Total**: ~101 kB (경량)
 
 ### 최적화 기법
 - CSS Variables로 스타일 재사용
-- 컴포넌트 지연 로딩 (선택적)
+- preconnect/dns-prefetch로 외부 리소스 사전 연결
 - 이미지 최적화 (favicon 등)
 - Cloudflare CDN 활용
 
@@ -232,20 +289,38 @@ npm run build
 {
   ko: { /* 한국어 */ },
   en: { /* English */ },
-  ja: { /* 日本語 */ }
+  ja: { /* 日本語 */ },
+  es: { /* Español */ }
 }
 ```
 
 ### 섹션별 번역
+- `meta`: SEO 메타 태그 (title, description, searchTitle)
 - `logo`: 로고 텍스트
 - `nav`: 네비게이션 메뉴
 - `hero`: 히어로 섹션
-- `search`: 검색 폼
+- `categories`: 카테고리 탐색
+- `howItWorks`: 작동 방식
+- `loading`: 로딩 상태
+- `error`: 에러 메시지
 - `results`: 검색 결과
-- `lawDetails`: 법률 상세
+- `status`: 법률 상태 라벨
+- `details`: 법률 상세
+- `recentSearches`: 최근 검색
+- `faq`: 자주 묻는 질문
+- `comparison`: 국가별 비교
+- `share`: 공유 기능
+- `trending`: 추천 검색
+- `relatedSearches`: 관련 검색
 - `footer`: 푸터
-- `about`: 소개 모달
-- `privacy`: 개인정보 처리방침
+
+### 언어 추가 시 수정 파일
+1. `src/i18n/translations.js` - 전체 번역 섹션 + `languages` 배열
+2. `src/components/CategoryBrowse.js` - `categorySearchQueries` 매핑
+3. `src/components/TrendingTopics.js` - `recommendedPool` (40개 항목)
+4. `src/services/aiService.js` - `languageInstructions` 매핑
+5. `public/index.html` - hreflang, og:locale:alternate, JSON-LD inLanguage
+6. `public/sitemap.xml` - 메인 페이지 hreflang 변형 URL
 
 ## 개발 히스토리
 
@@ -263,6 +338,21 @@ npm run build
 - **중앙 정렬** 레이아웃 개선
 - **카드 너비** 최적화 (500px)
 
+### v3.0.0 (Growth & Features)
+- **카테고리 탐색** 추가 (8개 카테고리)
+- **최근 검색** 기능 (localStorage, 최대 10개)
+- **국가별 법률 비교** (AI 응답 기반 5개국 비교)
+- **FAQ 섹션** (아코디언 UI, 6개 항목)
+- **소셜 공유** 기능 (X, Facebook, Reddit, 링크 복사)
+- **공유 가능한 URL** (`?q=` 쿼리 파라미터)
+- **추천 검색** 하이브리드 시스템 (개인화 + 랜덤, 40개 풀)
+- **관련 검색어** 표시 (AI 응답 기반 4개)
+- **스페인어** 추가 (4번째 지원 언어)
+- **고급 SEO** (JSON-LD 구조화 데이터, hreflang, 확장 사이트맵)
+- **Race Condition 수정** (비동기 검색 결과 꼬임 방지)
+- **동적 페이지 타이틀** (검색 결과에 따른 document.title 변경)
+- **성능 최적화** (preconnect, dns-prefetch)
+
 ## 연락처
 
 - **이메일**: support@lawornot.com
@@ -271,15 +361,11 @@ npm run build
 
 ## 라이선스
 
-© 2024 Is It Legal?. All rights reserved.
+© 2026 Is It Legal?. All rights reserved.
 
 ## 면책 조항
 
 이 서비스는 일반적인 정보 제공을 목적으로 하며, 법률 자문을 대체할 수 없습니다. 구체적인 법률 문제에 대해서는 전문 변호사와 상담하시기 바랍니다.
-
----
-
-**Built with ❤️ using React and Claude AI**
 
 ## Claude AI 작업 가이드라인
 

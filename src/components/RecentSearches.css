@@ -1,0 +1,95 @@
+.recent-searches {
+  max-width: 900px;
+  margin: 1.5rem auto 0;
+}
+
+.recent-searches-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.recent-searches-title {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.recent-clear-all {
+  background: none;
+  border: none;
+  color: var(--accent);
+  font-size: 0.85rem;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 500;
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.recent-clear-all:hover {
+  background: rgba(198, 166, 91, 0.15);
+}
+
+.recent-searches-chips {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.recent-chip {
+  display: flex;
+  align-items: center;
+  background: rgba(30, 58, 95, 0.25);
+  border: 1px solid rgba(198, 166, 91, 0.2);
+  border-radius: 24px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.recent-chip:hover {
+  border-color: var(--accent);
+  background: rgba(198, 166, 91, 0.15);
+}
+
+.recent-chip-text {
+  background: none;
+  border: none;
+  color: var(--text-light);
+  font-size: 0.85rem;
+  padding: 0.5rem 0.5rem 0.5rem 1rem;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.recent-chip:hover .recent-chip-text {
+  color: var(--accent);
+}
+
+.recent-chip-remove {
+  background: none;
+  border: none;
+  color: var(--text-light);
+  font-size: 1.1rem;
+  padding: 0.5rem 0.75rem 0.5rem 0.25rem;
+  cursor: pointer;
+  opacity: 0.5;
+  transition: all 0.2s ease;
+  line-height: 1;
+}
+
+.recent-chip-remove:hover {
+  opacity: 1;
+  color: #ef4444;
+}
+
+@media (max-width: 768px) {
+  .recent-searches {
+    padding: 0 1rem;
+  }
+}

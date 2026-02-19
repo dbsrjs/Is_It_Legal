@@ -1,103 +1,53 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 import './CountryComparison.css';
-import { lawsData } from '../data/lawsData';
 
-function CountryComparison() {
+function CountryComparison({ comparisons }) {
   const { t } = useLanguage();
-  const [selectedTopic, setSelectedTopic] = useState('');
 
-  // Get unique topics
-  const topics = [...new Set(lawsData.map(law => law.topic))];
-
-  // Filter laws by selected topic
-  const filteredLaws = selectedTopic
-    ? lawsData.filter(law => law.topic === selectedTopic)
-    : [];
+  if (!comparisons || comparisons.length === 0) {
+    return null;
+  }
 
   const getStatusIcon = (status) => {
     switch (status) {
       case 'legal':
-        return '🟢';
+        return '\uD83D\uDFE2';
       case 'conditional':
-        return '🟡';
+        return '\uD83D\uDFE1';
       case 'illegal':
-        return '🔴';
+        return '\uD83D\uDD34';
       default:
-        return '⚫';
+        return '\u26AB';
     }
   };
 
-  const getStatusClass = (status) => {
-    return `comparison-status status-${status}`;
+  const getStatusText = (status) => {
+    return t.status[status] || t.status.unclear;
   };
 
   return (
     <div className="country-comparison-section">
       <div className="container">
-        <h2>{t.comparison.title}</h2>
-        <p className="comparison-description">
-          {t.comparison.description}
-        </p>
+        <h2 className="comparison-title">{t.comparison.title}</h2>
+        <p className="comparison-description">{t.comparison.description}</p>
 
-        <div className="topic-selector">
-          <label htmlFor="topic-select">{t.comparison.selectTopic}:</label>
-          <select
-            id="topic-select"
-            value={selectedTopic}
-            onChange={(e) => setSelectedTopic(e.target.value)}
-            className="topic-dropdown"
-          >
-            <option value="">-- {t.comparison.selectTopic} --</option>
-            {topics.map(topic => (
-              <option key={topic} value={topic}>
-                {topic.replace('-', ' ').toUpperCase()}
-              </option>
-            ))}
-          </select>
+        <div className="comparison-grid">
+          {comparisons.map((item, index) => (
+            <div key={index} className={`comparison-card comparison-card-${item.status}`}>
+              <div className="comparison-card-header">
+                <span className="comparison-icon">{getStatusIcon(item.status)}</span>
+                <div>
+                  <h4 className="comparison-country">{item.country}</h4>
+                  <span className={`comparison-badge status-${item.status}`}>
+                    {getStatusText(item.status)}
+                  </span>
+                </div>
+              </div>
+              <p className="comparison-summary">{item.summary}</p>
+            </div>
+          ))}
         </div>
-
-        {filteredLaws.length > 0 && (
-          <div className="comparison-table-container">
-            <table className="comparison-table">
-              <thead>
-                <tr>
-                  <th>{t.comparison.country}</th>
-                  <th>{t.comparison.status}</th>
-                  <th>{t.comparison.summary}</th>
-                  <th>{t.details.updated}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredLaws.map(law => (
-                  <tr key={law.id}>
-                    <td className="country-cell">
-                      <strong>{law.countryName}</strong>
-                    </td>
-                    <td className="status-cell">
-                      <span className={getStatusClass(law.status)}>
-                        <span className="status-icon">{getStatusIcon(law.status)}</span>
-                        <span>{t.status[law.status]}</span>
-                      </span>
-                    </td>
-                    <td className="summary-cell">
-                      {law.summary}
-                    </td>
-                    <td className="date-cell">
-                      {law.updated}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-
-        {selectedTopic && filteredLaws.length === 0 && (
-          <div className="no-data">
-            <p>No data available for this topic yet.</p>
-          </div>
-        )}
       </div>
     </div>
   );
