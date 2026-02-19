@@ -50,10 +50,12 @@ function LawDetails({ laws }) {
               <p>{law.summary}</p>
             </div>
 
-            <div className="detail-content">
-              <h4>{t.details.details}</h4>
-              <p>{law.details}</p>
-            </div>
+            {law.details && (
+              <div className="detail-content">
+                <h4>{t.details.details}</h4>
+                <p>{law.details}</p>
+              </div>
+            )}
 
             {law.conditions && law.conditions.length > 0 && (
               <div className="detail-conditions">
@@ -66,23 +68,27 @@ function LawDetails({ laws }) {
               </div>
             )}
 
-            <div className="detail-penalties">
-              <h4>{t.details.penalties}</h4>
-              <p className="penalties-text">{law.penalties}</p>
-            </div>
+            {law.penalties && (
+              <div className="detail-penalties">
+                <h4>{t.details.penalties}</h4>
+                <p className="penalties-text">{law.penalties}</p>
+              </div>
+            )}
 
-            <div className="detail-sources">
-              <h4>{t.details.sources}</h4>
-              <ul className="sources-list">
-                {law.sources.map((source, index) => (
-                  <li key={index}>
-                    <a href={source} target="_blank" rel="noopener noreferrer">
-                      {source}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
+            {law.sources && law.sources.length > 0 && (
+              <div className="detail-sources">
+                <h4>{t.details.sources}</h4>
+                <ul className="sources-list">
+                  {law.sources.map((source, index) => (
+                    <li key={index}>
+                      <a href={source} target="_blank" rel="noopener noreferrer">
+                        {source}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
 
             <div className="detail-footer">
               <div className="detail-meta">

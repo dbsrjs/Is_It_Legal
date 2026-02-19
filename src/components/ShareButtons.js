@@ -2,11 +2,13 @@ import React, { useState } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 import './ShareButtons.css';
 
-function ShareButtons({ query, topic, country, status }) {
+function ShareButtons({ query, topic, country, status, summary }) {
   const { t } = useLanguage();
   const [copied, setCopied] = useState(false);
 
-  const shareUrl = `${window.location.origin}/?q=${encodeURIComponent(query)}`;
+  const resultData = JSON.stringify({ s: status, t: topic, c: country, m: summary });
+  const encoded = btoa(unescape(encodeURIComponent(resultData)));
+  const shareUrl = `${window.location.origin}/?q=${encodeURIComponent(query)}&r=${encoded}`;
 
   const getStatusIcon = (s) => {
     switch (s) {

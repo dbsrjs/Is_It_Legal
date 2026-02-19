@@ -129,17 +129,41 @@ function App() {
     }
   }, [language, addToRecentSearches, updateUrl, t]);
 
-  // URL 쿼리 파라미터에서 검색어 읽기
+  // URL 쿼리 파라미터에서 검색어 및 공유 결과 읽기
   useEffect(() => {
     if (initialSearchDone.current) return;
     const params = new URLSearchParams(window.location.search);
     const q = params.get('q');
+    const r = params.get('r');
     if (q) {
       initialSearchDone.current = true;
       setSearchQuery(q);
+      addToRecentSearches(q.trim());
+
+      // 공유된 결과 데이터가 있으면 즉시 표시 (AI 재검색 없음)
+      if (r) {
+        try {
+          const decoded = JSON.parse(decodeURIComponent(escape(atob(r))));
+          setSearchResults([{
+            id: Date.now(),
+            status: decoded.s,
+            topicName: decoded.t,
+            countryName: decoded.c,
+            summary: decoded.m,
+            topic: decoded.t,
+            country: decoded.c,
+            category: 'other',
+            updated: new Date().toISOString().split('T')[0]
+          }]);
+          setShowResults(true);
+          return;
+        } catch {}
+      }
+
+      // 공유 데이터 없으면 AI 검색 실행
       executeSearch(q, false);
     }
-  }, [executeSearch]);
+  }, [executeSearch, addToRecentSearches]);
 
   // 브라우저 뒤로가기/앞으로가기 지원
   useEffect(() => {
@@ -254,6 +278,7 @@ function App() {
                     topic={searchResults[0].topicName}
                     country={searchResults[0].countryName}
                     status={searchResults[0].status}
+                    summary={searchResults[0].summary}
                   />
                   {searchResults[0].comparisons && (
                     <CountryComparison comparisons={searchResults[0].comparisons} />
