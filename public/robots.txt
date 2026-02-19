@@ -1,5 +1,19 @@
-# https://www.robotstxt.org/robotstxt.html
 User-agent: *
+Allow: /
+Disallow: /static/js/
+Disallow: /static/css/
+Disallow: /static/media/
+
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Yandex
+Allow: /
+
+User-agent: Baiduspider
 Allow: /
 
 Sitemap: https://www.lawornot.com/sitemap.xml

@@ -4,10 +4,7 @@ const API_KEY = process.env.REACT_APP_GEMINI_API_KEY;
 
 // 1. API 키 안전장치: 키가 로드되지 않았을 때 콘솔에 명확히 알려줍니다.
 if (!API_KEY) {
-  console.error("❌ API Key is missing! Check your .env file.");
-} else {
-  // 배포 시 보안을 위해 아래 로그는 삭제하는 것이 좋습니다.
-  console.log("Key loaded, length:", API_KEY.length); 
+  console.error("API Key is missing! Check your .env file.");
 }
 
 const genAI = new GoogleGenerativeAI(API_KEY);
@@ -18,7 +15,8 @@ export const searchLegalInformation = async (query, language = 'en') => {
     const languageInstructions = {
       ko: "모든 응답을 한국어로 작성하세요. 법률 용어를 정확하게 번역하고, 한국 독자들이 이해하기 쉽게 설명하세요.",
       en: "Write all responses in English. Use clear and professional legal terminology.",
-      ja: "すべての回答を日本語で記述してください。法律用語を正確に翻訳し、日本の読者が理解しやすいように説明してください。"
+      ja: "すべての回答を日本語で記述してください。法律用語を正確に翻訳し、日本の読者が理解しやすいように説明してください。",
+      es: "Escribe todas las respuestas en español. Usa terminología legal clara y profesional, adecuada para lectores hispanohablantes."
     };
 
     // 2. 모델 설정
@@ -49,7 +47,12 @@ export const searchLegalInformation = async (query, language = 'en') => {
       "conditions": ["condition 1", "condition 2", ...] (array of strings, or empty array if status is 'legal' or 'illegal'),
       "penalties": "description of penalties for violations",
       "sources": ["url1", "url2", ...] (array of official government or legal source URLs),
-      "lastUpdated": "YYYY-MM-DD"
+      "lastUpdated": "YYYY-MM-DD",
+      "comparisons": [
+        {"country": "Country Name", "status": "legal|conditional|illegal|unclear", "summary": "one sentence summary of the legal status in this country"},
+        ... (5 different countries, excluding the main country above)
+      ],
+      "relatedSearches": ["related query 1", "related query 2", "related query 3", "related query 4"]
     }
 
     Important guidelines:
@@ -63,18 +66,16 @@ export const searchLegalInformation = async (query, language = 'en') => {
     8. Focus on current laws as of 2026
     9. Be objective and factual
     10. Include specific regulations, registration requirements, permits, or licenses if applicable
+    11. For the "comparisons" array, include 5 different countries (excluding the main country) with diverse legal statuses to show how the same topic is regulated globally
+    12. For "relatedSearches", provide 4 related search queries - these should be the same topic in other countries, or related topics in the same country (e.g., if query is "drone Japan", suggest "drone Korea", "drone Thailand", "camera Japan", "VPN Japan")
 
     Return ONLY the JSON object, no additional text.
     `;
-
-    console.log("🚀 Requesting Gemini API..."); 
 
     // 4. API 호출
     const result = await model.generateContent(prompt);
     const response = await result.response;
     const text = response.text();
-
-    console.log("✅ API Response received");
 
     // 5. JSON 파싱
     // responseMimeType을 설정했으므로 복잡한 정규식 없이 바로 파싱 가능합니다.

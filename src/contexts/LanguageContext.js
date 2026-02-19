@@ -33,9 +33,24 @@ export const LanguageProvider = ({ children }) => {
 
   const [language, setLanguage] = useState(getInitialLanguage);
 
-  // 언어 변경 시 로컬 스토리지에 저장
+  // 언어 변경 시 로컬 스토리지에 저장 및 동적 SEO 업데이트
   useEffect(() => {
     localStorage.setItem('language', language);
+
+    // HTML lang 속성 업데이트
+    document.documentElement.lang = language;
+
+    // 동적 title 업데이트
+    const t = translations[language];
+    if (t && t.meta) {
+      document.title = t.meta.title;
+
+      // meta description 동적 업데이트
+      const metaDesc = document.querySelector('meta[name="description"]');
+      if (metaDesc) {
+        metaDesc.setAttribute('content', t.meta.description);
+      }
+    }
   }, [language]);
 
   // 현재 언어의 번역 가져오기

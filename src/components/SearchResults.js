@@ -9,8 +9,8 @@ function SearchResults({ results, query }) {
     return (
       <div className="search-results-container">
         <div className="no-results">
-          <h3>No results found for "{query}"</h3>
-          <p>Try different keywords or check the spelling</p>
+          <h3>"{query}" {t.results.noResults}</h3>
+          <p>{t.results.noResultsTip}</p>
         </div>
       </div>
     );
@@ -41,7 +41,7 @@ function SearchResults({ results, query }) {
     <div className="search-results-container">
       <div className="results-header">
         <h2>{t.results.title} "{query}"</h2>
-        <p className="results-count">{results.length} result{results.length !== 1 ? 's' : ''} found</p>
+        <p className="results-count">{results.length} {t.results.resultCount}</p>
       </div>
 
       <div className="results-grid">

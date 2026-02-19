@@ -1,10 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import './App.css';
 import SearchResults from './components/SearchResults';
 import LawDetails from './components/LawDetails';
 import LoadingSpinner from './components/LoadingSpinner';
 import ErrorMessage from './components/ErrorMessage';
 import LanguageSelector from './components/LanguageSelector';
+import CategoryBrowse from './components/CategoryBrowse';
+import RecentSearches from './components/RecentSearches';
+import CountryComparison from './components/CountryComparison';
+import ShareButtons from './components/ShareButtons';
+import TrendingTopics from './components/TrendingTopics';
+import RelatedSearches from './components/RelatedSearches';
+import FAQ from './components/FAQ';
 import AboutModal from './components/AboutModal';
 import PrivacyModal from './components/PrivacyModal';
 import { useLanguage } from './contexts/LanguageContext';
@@ -19,24 +26,73 @@ function App() {
   const [error, setError] = useState(null);
   const [isAboutModalOpen, setIsAboutModalOpen] = useState(false);
   const [isPrivacyModalOpen, setIsPrivacyModalOpen] = useState(false);
+  const initialSearchDone = useRef(false);
+  const searchIdRef = useRef(0);
+  const [recentSearches, setRecentSearches] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('recentSearches')) || [];
+    } catch {
+      return [];
+    }
+  });
 
-  const handleSearch = async (e) => {
-    if (e) e.preventDefault();
+  const addToRecentSearches = useCallback((query) => {
+    setRecentSearches((prev) => {
+      const filtered = prev.filter((item) => item !== query);
+      const updated = [query, ...filtered].slice(0, 10);
+      localStorage.setItem('recentSearches', JSON.stringify(updated));
+      return updated;
+    });
+  }, []);
 
-    if (!searchQuery.trim()) {
+  const removeRecentSearch = useCallback((query) => {
+    setRecentSearches((prev) => {
+      const updated = prev.filter((item) => item !== query);
+      localStorage.setItem('recentSearches', JSON.stringify(updated));
+      return updated;
+    });
+  }, []);
+
+  const clearAllRecentSearches = useCallback(() => {
+    setRecentSearches([]);
+    localStorage.removeItem('recentSearches');
+  }, []);
+
+  const updateUrl = useCallback((query) => {
+    if (query && query.trim()) {
+      const url = new URL(window.location);
+      url.searchParams.set('q', query.trim());
+      window.history.pushState({q: query.trim()}, '', url);
+    } else {
+      const url = new URL(window.location);
+      url.searchParams.delete('q');
+      window.history.pushState({}, '', url);
+    }
+  }, []);
+
+  const executeSearch = useCallback(async (query, shouldUpdateUrl = true) => {
+    if (!query || !query.trim()) {
       setSearchResults(null);
       setShowResults(false);
       setError(null);
+      if (shouldUpdateUrl) updateUrl('');
+      if (t.meta && t.meta.title) {
+        document.title = t.meta.title;
+      }
       return;
     }
 
-    // Reset states
+    const currentSearchId = ++searchIdRef.current;
+
+    setSearchQuery(query);
+    addToRecentSearches(query.trim());
+    if (shouldUpdateUrl) updateUrl(query);
+
     setIsLoading(true);
     setShowResults(false);
     setError(null);
     setSearchResults(null);
 
-    // Scroll to results section
     setTimeout(() => {
       const resultsSection = document.getElementById('search-results');
       if (resultsSection) {
@@ -45,57 +101,83 @@ function App() {
     }, 100);
 
     try {
-      // Call AI service with current language
-      const response = await searchLegalInformation(searchQuery, language);
+      const response = await searchLegalInformation(query, language);
+
+      if (currentSearchId !== searchIdRef.current) return;
 
       if (response.success) {
         setSearchResults([response.data]);
         setShowResults(true);
+
+        if (t.meta && t.meta.searchTitle) {
+          const topic = response.data.topicName || query;
+          const country = response.data.countryName || '';
+          document.title = t.meta.searchTitle
+            .replace('{topic}', topic)
+            .replace('{country}', country);
+        }
       } else {
         setError(response.error);
       }
     } catch (err) {
+      if (currentSearchId !== searchIdRef.current) return;
       setError(err.message || 'An unexpected error occurred');
     } finally {
-      setIsLoading(false);
+      if (currentSearchId === searchIdRef.current) {
+        setIsLoading(false);
+      }
     }
+  }, [language, addToRecentSearches, updateUrl, t]);
+
+  // URL 쿼리 파라미터에서 검색어 읽기
+  useEffect(() => {
+    if (initialSearchDone.current) return;
+    const params = new URLSearchParams(window.location.search);
+    const q = params.get('q');
+    if (q) {
+      initialSearchDone.current = true;
+      setSearchQuery(q);
+      executeSearch(q, false);
+    }
+  }, [executeSearch]);
+
+  // 브라우저 뒤로가기/앞으로가기 지원
+  useEffect(() => {
+    const handlePopState = (event) => {
+      const params = new URLSearchParams(window.location.search);
+      const q = params.get('q');
+      if (q) {
+        setSearchQuery(q);
+        executeSearch(q, false);
+      } else {
+        setSearchQuery('');
+        setSearchResults(null);
+        setShowResults(false);
+        setError(null);
+        // 홈으로 돌아갈 때 기본 title 복원
+        if (t.meta && t.meta.title) {
+          document.title = t.meta.title;
+        }
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [executeSearch, t]);
+
+  const handleSearch = async (e) => {
+    if (e) e.preventDefault();
+    executeSearch(searchQuery);
   };
 
   const handleExampleClick = async (example) => {
     setSearchQuery(example);
-
-    // Trigger search with the example query
-    setIsLoading(true);
-    setShowResults(false);
-    setError(null);
-    setSearchResults(null);
-
-    setTimeout(() => {
-      const resultsSection = document.getElementById('search-results');
-      if (resultsSection) {
-        resultsSection.scrollIntoView({ behavior: 'smooth' });
-      }
-    }, 100);
-
-    try {
-      const response = await searchLegalInformation(example, language);
-
-      if (response.success) {
-        setSearchResults([response.data]);
-        setShowResults(true);
-      } else {
-        setError(response.error);
-      }
-    } catch (err) {
-      setError(err.message || 'An unexpected error occurred');
-    } finally {
-      setIsLoading(false);
-    }
+    executeSearch(example);
   };
 
   const handleRetry = () => {
     setError(null);
-    handleSearch();
+    executeSearch(searchQuery);
   };
 
   return (
@@ -112,7 +194,7 @@ function App() {
       </header>
 
       <main className="main">
-        <section className="hero">
+        <section className="hero" aria-label="Legal search">
           <div className="container">
             <h2 className="hero-title">
               {t.hero.title}
@@ -144,10 +226,17 @@ function App() {
               <button onClick={() => handleExampleClick(t.hero.examples.vpn)}>{t.hero.examples.vpn}</button>
               <button onClick={() => handleExampleClick(t.hero.examples.cannabis)}>{t.hero.examples.cannabis}</button>
             </div>
+
+            <RecentSearches
+              searches={recentSearches}
+              onSearchClick={handleExampleClick}
+              onRemove={removeRecentSearch}
+              onClearAll={clearAllRecentSearches}
+            />
           </div>
         </section>
 
-        <section id="search-results">
+        <section id="search-results" aria-label="Search results">
           {isLoading && <LoadingSpinner />}
 
           {error && (
@@ -158,14 +247,34 @@ function App() {
             <>
               <SearchResults results={searchResults} query={searchQuery} />
               {searchResults && searchResults.length > 0 && (
-                <LawDetails laws={searchResults} />
+                <>
+                  <LawDetails laws={searchResults} />
+                  <ShareButtons
+                    query={searchQuery}
+                    topic={searchResults[0].topicName}
+                    country={searchResults[0].countryName}
+                    status={searchResults[0].status}
+                  />
+                  {searchResults[0].comparisons && (
+                    <CountryComparison comparisons={searchResults[0].comparisons} />
+                  )}
+                  {searchResults[0].relatedSearches && searchResults[0].relatedSearches.length > 0 && (
+                    <RelatedSearches
+                      searches={searchResults[0].relatedSearches}
+                      onSearchClick={handleExampleClick}
+                    />
+                  )}
+                </>
               )}
             </>
           )}
         </section>
 
+        <TrendingTopics onSearchClick={handleExampleClick} />
 
-        <section className="how-it-works">
+        <CategoryBrowse onCategoryClick={handleExampleClick} />
+
+        <section className="how-it-works" aria-label="How it works">
           <div className="container">
             <h3>{t.howItWorks.title}</h3>
             <div className="steps">
@@ -187,9 +296,11 @@ function App() {
             </div>
           </div>
         </section>
+
+        <FAQ />
       </main>
 
-      <footer className="footer">
+      <footer className="footer" aria-label="Site footer">
         <div className="container">
           <div className="footer-content">
             <div className="footer-section">
