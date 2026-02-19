@@ -15,6 +15,7 @@ import FAQ from './components/FAQ';
 import AboutModal from './components/AboutModal';
 import PrivacyModal from './components/PrivacyModal';
 import { useLanguage } from './contexts/LanguageContext';
+import pako from 'pako';
 import { searchLegalInformation } from './services/aiService';
 
 function App() {
@@ -143,7 +144,10 @@ function App() {
       // 공유된 결과 데이터가 있으면 즉시 표시 (AI 재검색 없음)
       if (r) {
         try {
-          const decoded = JSON.parse(decodeURIComponent(escape(atob(r))));
+          const binary = atob(r);
+          const bytes = new Uint8Array(binary.length);
+          for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+          const decoded = JSON.parse(new TextDecoder().decode(pako.inflate(bytes)));
           setSearchResults([{
             id: Date.now(),
             status: decoded.s,

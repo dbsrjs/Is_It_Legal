@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import pako from 'pako';
 import { useLanguage } from '../contexts/LanguageContext';
 import './ShareButtons.css';
 
@@ -10,7 +11,8 @@ function ShareButtons({ query, topic, country, status, summary, details, penalti
     s: status, t: topic, c: country, m: summary,
     d: details || '', p: penalties || '', u: sources || [], n: conditions || []
   });
-  const encoded = btoa(unescape(encodeURIComponent(resultData)));
+  const compressed = pako.deflate(new TextEncoder().encode(resultData));
+  const encoded = btoa(String.fromCharCode(...compressed));
   const shareUrl = `${window.location.origin}/?q=${encodeURIComponent(query)}&r=${encodeURIComponent(encoded)}`;
 
   const getStatusIcon = (s) => {
