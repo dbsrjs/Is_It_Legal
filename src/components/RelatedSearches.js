@@ -2,8 +2,25 @@ import React from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 import './RelatedSearches.css';
 
-function RelatedSearches({ searches, onSearchClick }) {
+function RelatedSearches({ searches, onSearchClick, loading }) {
   const { t } = useLanguage();
+
+  if (loading) {
+    return (
+      <div className="related-section">
+        <div className="container">
+          <h3 className="related-title">{t.relatedSearches.title}</h3>
+          <div className="related-buttons">
+            {[0, 1, 2, 3].map(i => (
+              <div key={i} className="related-btn related-skeleton">
+                <div className="skeleton-line" style={{ width: `${80 + i * 20}px`, height: '14px' }} />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (!searches || searches.length === 0) {
     return null;

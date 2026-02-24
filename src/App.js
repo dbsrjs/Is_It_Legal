@@ -16,7 +16,7 @@ import AboutModal from './components/AboutModal';
 import PrivacyModal from './components/PrivacyModal';
 import { useLanguage } from './contexts/LanguageContext';
 import pako from 'pako';
-import { searchLegalInformation } from './services/aiService';
+import { searchLegalInformation, searchComparisons } from './services/aiService';
 
 function App() {
   const { language, t } = useLanguage();
@@ -27,6 +27,7 @@ function App() {
   const [error, setError] = useState(null);
   const [isAboutModalOpen, setIsAboutModalOpen] = useState(false);
   const [isPrivacyModalOpen, setIsPrivacyModalOpen] = useState(false);
+  const [comparisonsLoading, setComparisonsLoading] = useState(false);
   const initialSearchDone = useRef(false);
   const searchIdRef = useRef(0);
   const [recentSearches, setRecentSearches] = useState(() => {
@@ -102,6 +103,7 @@ function App() {
     }, 100);
 
     try {
+      // Phase 1: 핵심 법률 정보 (빠른 응답)
       const response = await searchLegalInformation(query, language);
 
       if (currentSearchId !== searchIdRef.current) return;
@@ -109,6 +111,7 @@ function App() {
       if (response.success) {
         setSearchResults([response.data]);
         setShowResults(true);
+        setIsLoading(false);
 
         if (t.meta && t.meta.searchTitle) {
           const topic = response.data.topicName || query;
@@ -117,16 +120,39 @@ function App() {
             .replace('{topic}', topic)
             .replace('{country}', country);
         }
+
+        // Phase 2: 국가별 비교 + 관련 검색어 (백그라운드)
+        if (!response.data.comparisons && !response.fromCache) {
+          setComparisonsLoading(true);
+          try {
+            const extras = await searchComparisons(
+              response.data.topic,
+              response.data.country,
+              query,
+              language
+            );
+            if (currentSearchId !== searchIdRef.current) return;
+            if (extras.success) {
+              setSearchResults(prev => {
+                if (!prev || prev.length === 0) return prev;
+                const updated = { ...prev[0], ...extras.data };
+                return [updated];
+              });
+            }
+          } catch {} finally {
+            if (currentSearchId === searchIdRef.current) {
+              setComparisonsLoading(false);
+            }
+          }
+        }
       } else {
         setError(response.error);
+        setIsLoading(false);
       }
     } catch (err) {
       if (currentSearchId !== searchIdRef.current) return;
       setError(err.message || 'An unexpected error occurred');
-    } finally {
-      if (currentSearchId === searchIdRef.current) {
-        setIsLoading(false);
-      }
+      setIsLoading(false);
     }
   }, [language, addToRecentSearches, updateUrl, t]);
 
@@ -285,13 +311,14 @@ function App() {
                     sources={searchResults[0].sources}
                     conditions={searchResults[0].conditions}
                   />
-                  {searchResults[0].comparisons && (
-                    <CountryComparison comparisons={searchResults[0].comparisons} />
+                  {(searchResults[0].comparisons || comparisonsLoading) && (
+                    <CountryComparison comparisons={searchResults[0].comparisons} loading={comparisonsLoading} />
                   )}
-                  {searchResults[0].relatedSearches && searchResults[0].relatedSearches.length > 0 && (
+                  {(searchResults[0].relatedSearches?.length > 0 || comparisonsLoading) && (
                     <RelatedSearches
                       searches={searchResults[0].relatedSearches}
                       onSearchClick={handleExampleClick}
+                      loading={comparisonsLoading}
                     />
                   )}
                 </>
