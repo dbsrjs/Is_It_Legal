@@ -1,71 +1,92 @@
+/* R3 — Related searches as a simple link list */
 .related-section {
-  padding: 3rem 0;
-  background: var(--bg-dark);
+  padding: 28px 0 40px;
+  background: var(--bg);
   position: relative;
 }
 
 .related-section .container {
-  max-width: 900px;
-  text-align: center;
+  max-width: 960px;
+  text-align: left;
+  padding: 0 32px;
 }
 
 .related-title {
-  font-size: 1.5rem;
-  color: white;
-  margin-bottom: 1.5rem;
-  font-weight: 700;
+  font-family: 'Pretendard', sans-serif;
+  font-size: 12px;
+  color: var(--gold);
+  margin: 0 0 14px 0;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
 }
 
 .related-buttons {
   display: flex;
-  gap: 0.75rem;
-  justify-content: center;
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 0;
+  justify-content: flex-start;
+  flex-wrap: nowrap;
 }
 
 .related-btn {
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.7rem 1.4rem;
-  background: rgba(30, 58, 95, 0.3);
-  border: 1px solid rgba(198, 166, 91, 0.2);
-  border-radius: 12px;
-  color: var(--text-light);
-  font-size: 0.9rem;
-  font-weight: 500;
+  gap: 12px;
+  padding: 14px 0;
+  background: transparent;
+  border: none;
+  border-top: 1px solid var(--border);
+  border-radius: 0;
+  color: var(--text-body);
+  font-size: 16px;
+  font-weight: 400;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: color 0.2s ease;
   font-family: inherit;
-  backdrop-filter: blur(10px);
+  backdrop-filter: none;
+  text-align: left;
+  width: 100%;
+  justify-content: flex-start;
+}
+
+.related-btn:first-child {
+  border-top: none;
 }
 
 .related-btn:hover {
-  background: rgba(198, 166, 91, 0.15);
-  border-color: var(--accent);
-  color: var(--accent);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 15px var(--glow-accent);
+  background: transparent;
+  border-color: var(--border);
+  color: var(--text);
+  transform: none;
+  box-shadow: none;
 }
 
 .related-btn svg {
+  display: none;
+}
+
+.related-btn::before {
+  content: '→';
+  color: var(--text-dim);
+  font-size: 14px;
   flex-shrink: 0;
-  opacity: 0.6;
+  width: 14px;
+  transition: color 0.2s ease;
 }
 
-.related-btn:hover svg {
-  opacity: 1;
+.related-btn:hover::before {
+  color: var(--gold);
 }
 
-/* Skeleton Loading */
 .related-skeleton {
   cursor: default;
   pointer-events: none;
 }
 
 .related-skeleton .skeleton-line {
-  border-radius: 6px;
-  background: rgba(148, 163, 184, 0.15);
+  border-radius: 3px;
+  background: rgba(237, 231, 214, 0.1);
   animation: skeleton-pulse 1.5s ease-in-out infinite;
 }
 
@@ -75,14 +96,18 @@
 }
 
 @media (max-width: 768px) {
+  .related-section .container {
+    padding: 0 24px;
+  }
+
   .related-buttons {
     flex-direction: column;
-    align-items: center;
+    align-items: stretch;
   }
 
   .related-btn {
     width: 100%;
-    max-width: 300px;
-    justify-content: center;
+    max-width: 100%;
+    font-size: 15px;
   }
 }

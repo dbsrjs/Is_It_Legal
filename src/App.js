@@ -242,7 +242,20 @@ function App() {
     <div className="App">
       <header className="header">
         <div className="container">
-          <h1 className="logo">{t.logo}</h1>
+          <h1 className="logo">
+            {(() => {
+              const logo = t.logo || '';
+              const q = logo.lastIndexOf('?');
+              if (q === -1) return logo;
+              return (
+                <>
+                  {logo.slice(0, q)}
+                  <span className="logo-mark">?</span>
+                  {logo.slice(q + 1)}
+                </>
+              );
+            })()}
+          </h1>
           <nav className="nav">
             <a href="#home" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>{t.nav.home}</a>
             <a href="#about" onClick={(e) => { e.preventDefault(); setIsAboutModalOpen(true); }}>{t.nav.about}</a>

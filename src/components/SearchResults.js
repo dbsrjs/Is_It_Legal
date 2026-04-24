@@ -16,16 +16,16 @@ function SearchResults({ results, query }) {
     );
   }
 
-  const getStatusIcon = (status) => {
+  const getStatusGlyph = (status) => {
     switch (status) {
       case 'legal':
-        return '🟢';
+        return '✓';
       case 'conditional':
-        return '🟡';
+        return '!';
       case 'illegal':
-        return '🔴';
+        return '×';
       default:
-        return '⚫';
+        return '?';
     }
   };
 
@@ -33,52 +33,41 @@ function SearchResults({ results, query }) {
     return t.status[status] || t.status.unclear;
   };
 
-  const getStatusClass = (status) => {
-    return `status-badge status-${status}`;
-  };
-
   return (
     <div className="search-results-container">
-      <div className="results-header">
-        <h2>{t.results.title} "{query}"</h2>
-        <p className="results-count">{results.length} {t.results.resultCount}</p>
-      </div>
-
       <div className="results-grid">
         {results.map((law) => (
-          <div key={law.id} className="result-card">
-            <div className="result-header">
-              <div className="result-title">
-                <h3>{law.topicName} {t.results.in} {law.countryName}</h3>
+          <article key={law.id} className="result-card">
+            <div className="result-meta-top">
+              {law.countryName && <span>{law.countryName}</span>}
+              {law.category && (
+                <>
+                  <span className="sep">·</span>
+                  <span className="meta-category">{law.category}</span>
+                </>
+              )}
+              {law.updated && (
+                <>
+                  <span className="sep">·</span>
+                  <span>{t.details.updated} {law.updated}</span>
+                </>
+              )}
+            </div>
+
+            <h2 className="result-title serif">
+              {law.topicName}{law.countryName ? ` · ${law.countryName}` : ''}
+            </h2>
+
+            <div className={`verdict verdict-${law.status}`}>
+              <div className="verdict-icon" aria-hidden="true">
+                {getStatusGlyph(law.status)}
               </div>
-              <div className={getStatusClass(law.status)}>
-                <span className="status-icon">{getStatusIcon(law.status)}</span>
-                <span className="status-text">{getStatusText(law.status)}</span>
+              <div className="verdict-body">
+                <div className="verdict-label">{getStatusText(law.status)}</div>
+                <div className="verdict-summary">{law.summary}</div>
               </div>
             </div>
-
-            <p className="result-summary">{law.summary}</p>
-
-            <div className="result-details">
-              <button
-                className="view-details-btn"
-                onClick={() => {
-                  // Scroll to detailed view
-                  const detailsSection = document.getElementById(`law-${law.id}`);
-                  if (detailsSection) {
-                    detailsSection.scrollIntoView({ behavior: 'smooth' });
-                  }
-                }}
-              >
-                {t.results.viewDetails} →
-              </button>
-            </div>
-
-            <div className="result-meta">
-              <span className="category-tag">{law.category}</span>
-              <span className="update-date">{t.details.updated} {law.updated}</span>
-            </div>
-          </div>
+          </article>
         ))}
       </div>
     </div>

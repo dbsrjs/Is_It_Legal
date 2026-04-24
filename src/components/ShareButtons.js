@@ -63,8 +63,8 @@ function ShareButtons({ query, topic, country, status, summary, details, penalti
 
   return (
     <div className="share-section">
-      <div className="container">
-        <h3 className="share-title">{t.share.title}</h3>
+      <div className="container share-container">
+        <span className="share-title">{t.share.title}</span>
         <div className="share-buttons">
           <button
             className={`share-btn share-btn-copy ${copied ? 'copied' : ''}`}
