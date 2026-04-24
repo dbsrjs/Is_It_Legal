@@ -5,19 +5,6 @@ import './CountryComparison.css';
 function CountryComparison({ comparisons, loading }) {
   const { t } = useLanguage();
 
-  const getStatusIcon = (status) => {
-    switch (status) {
-      case 'legal':
-        return '\uD83D\uDFE2';
-      case 'conditional':
-        return '\uD83D\uDFE1';
-      case 'illegal':
-        return '\uD83D\uDD34';
-      default:
-        return '\u26AB';
-    }
-  };
-
   const getStatusText = (status) => {
     return t.status[status] || t.status.unclear;
   };
@@ -26,20 +13,20 @@ function CountryComparison({ comparisons, loading }) {
     return (
       <div className="country-comparison-section">
         <div className="container">
-          <h2 className="comparison-title">{t.comparison.title}</h2>
-          <p className="comparison-description">{t.comparison.description}</p>
+          <h2 className="comparison-title serif">{t.comparison.title}</h2>
           <div className="comparison-grid">
             {[0, 1, 2, 3, 4].map(i => (
               <div key={i} className="comparison-card comparison-skeleton">
-                <div className="comparison-card-header">
-                  <div className="skeleton-circle" />
-                  <div>
-                    <div className="skeleton-line skeleton-country" />
-                    <div className="skeleton-line skeleton-badge" />
-                  </div>
+                <div className="comparison-col-country">
+                  <div className="skeleton-line skeleton-country" />
                 </div>
-                <div className="skeleton-line skeleton-text" />
-                <div className="skeleton-line skeleton-text-short" />
+                <div className="comparison-col-badge">
+                  <div className="skeleton-circle" />
+                  <div className="skeleton-line skeleton-badge" />
+                </div>
+                <div className="comparison-col-summary">
+                  <div className="skeleton-line skeleton-text" />
+                </div>
               </div>
             ))}
           </div>
@@ -55,22 +42,22 @@ function CountryComparison({ comparisons, loading }) {
   return (
     <div className="country-comparison-section">
       <div className="container">
-        <h2 className="comparison-title">{t.comparison.title}</h2>
-        <p className="comparison-description">{t.comparison.description}</p>
+        <h2 className="comparison-title serif">{t.comparison.title}</h2>
 
         <div className="comparison-grid">
           {comparisons.map((item, index) => (
             <div key={index} className={`comparison-card comparison-card-${item.status}`}>
-              <div className="comparison-card-header">
-                <span className="comparison-icon">{getStatusIcon(item.status)}</span>
-                <div>
-                  <h4 className="comparison-country">{item.country}</h4>
-                  <span className={`comparison-badge status-${item.status}`}>
-                    {getStatusText(item.status)}
-                  </span>
-                </div>
+              <div className="comparison-col-country">
+                <span className="comparison-country">{item.country}</span>
               </div>
-              <p className="comparison-summary">{item.summary}</p>
+              <div className="comparison-col-badge">
+                <span className={`comparison-badge status-${item.status}`}>
+                  {getStatusText(item.status)}
+                </span>
+              </div>
+              <div className="comparison-col-summary">
+                {item.summary}
+              </div>
             </div>
           ))}
         </div>

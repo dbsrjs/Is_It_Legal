@@ -1,83 +1,54 @@
+/* R3 — Article body style */
 .law-details-section {
-  padding: 4rem 0;
-  background: var(--bg-dark);
+  padding: 0 0 40px;
+  background: var(--bg);
   position: relative;
-}
-
-.law-details-section .container {
-  max-width: 900px;
 }
 
 .law-details-section::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--accent), transparent);
-  opacity: 0.3;
+  display: none;
+}
+
+.law-details-section .container {
+  max-width: 720px;
+  padding: 0 32px;
 }
 
 .details-section-title {
-  text-align: center;
-  font-size: 2.5rem;
-  color: white;
-  margin-bottom: 4rem;
-  font-weight: 800;
-  letter-spacing: -0.02em;
+  display: none; /* The topic title is already shown by SearchResults */
 }
 
 .law-detail-card {
-  background: rgba(30, 58, 95, 0.2);
-  border: 1px solid rgba(198, 166, 91, 0.2);
-  border-radius: 24px;
-  padding: 3rem;
-  margin-bottom: 2.5rem;
-  backdrop-filter: blur(10px);
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  margin: 0 0 40px;
+  backdrop-filter: none;
   scroll-margin-top: 100px;
   position: relative;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .law-detail-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  display: none;
 }
 
 .detail-header {
-  margin-bottom: 2.5rem;
-  padding-bottom: 2rem;
-  border-bottom: 1px solid var(--border);
+  display: none; /* avoid duplication with SearchResults verdict block */
 }
 
 .detail-title {
-  font-size: 2rem;
-  color: white;
-  margin-bottom: 1.25rem;
-  font-weight: 700;
-  line-height: 1.3;
+  display: none;
 }
 
 .detail-status {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
+  display: none;
 }
 
-.status-icon-large {
-  font-size: 2.2rem;
-}
-
+.status-icon-large,
 .status-text-large {
-  font-size: 1.4rem;
-  font-weight: 700;
-  color: var(--accent);
+  display: none;
 }
 
 .detail-summary,
@@ -85,7 +56,7 @@
 .detail-conditions,
 .detail-penalties,
 .detail-sources {
-  margin-bottom: 2.5rem;
+  margin-bottom: 36px;
 }
 
 .detail-summary h4,
@@ -93,209 +64,182 @@
 .detail-conditions h4,
 .detail-penalties h4,
 .detail-sources h4 {
-  font-size: 1.3rem;
-  color: var(--accent);
-  margin-bottom: 1.25rem;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  font-weight: 700;
+  font-family: 'Pretendard', sans-serif;
+  font-size: 12px;
+  color: var(--gold);
+  margin: 0 0 12px 0;
+  display: block;
+  gap: 0;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
 }
 
-.detail-summary h4::before {
-  content: '📋';
-  font-size: 1.5rem;
-}
-
-.detail-content h4::before {
-  content: '📖';
-  font-size: 1.5rem;
-}
-
-.detail-conditions h4::before {
-  content: '✓';
-  font-size: 1.5rem;
-}
-
-.detail-penalties h4::before {
-  content: '⚠️';
-  font-size: 1.5rem;
-}
-
+.detail-summary h4::before,
+.detail-content h4::before,
+.detail-conditions h4::before,
+.detail-penalties h4::before,
 .detail-sources h4::before {
-  content: '🔗';
-  font-size: 1.5rem;
+  content: none;
 }
 
 .detail-summary p,
 .detail-content p {
-  color: var(--text-light);
-  line-height: 1.9;
-  font-size: 1.05rem;
+  color: var(--text-body);
+  line-height: 1.75;
+  font-size: 17px;
+  font-weight: 400;
+}
+
+.detail-summary p + p,
+.detail-content p + p {
+  margin-top: 18px;
+}
+
+/* Summary block hidden — already shown in verdict */
+.detail-summary {
+  display: none;
+}
+
+/* Conditions — pulled sidebar-style block */
+.detail-conditions {
+  border-left: 2px solid var(--gold);
+  padding-left: 24px;
 }
 
 .detail-conditions ul {
   list-style: none;
   padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .detail-conditions li {
-  background: rgba(30, 58, 95, 0.3);
-  padding: 1.2rem 1.75rem;
-  margin-bottom: 1rem;
-  border-radius: 12px;
-  border-left: 3px solid var(--accent);
-  color: var(--text-light);
-  line-height: 1.7;
-  transition: all 0.3s ease;
+  background: transparent;
+  padding: 0;
+  margin: 0;
+  border-radius: 0;
+  border-left: none;
+  color: var(--text-body);
+  font-size: 16px;
+  line-height: 1.55;
+  transition: none;
 }
 
 .detail-conditions li:hover {
-  background: rgba(30, 58, 95, 0.4);
-  border-left-color: var(--accent);
-  transform: translateX(5px);
+  background: transparent;
+  border-left-color: transparent;
+  transform: none;
 }
 
 .detail-conditions li::before {
-  content: '• ';
-  color: var(--accent);
-  font-weight: bold;
-  margin-right: 0.75rem;
-  font-size: 1.2rem;
+  content: none;
 }
 
 .penalties-text {
-  background: rgba(251, 191, 36, 0.15);
-  padding: 1.5rem;
-  border-radius: 12px;
-  border: 1px solid rgba(251, 191, 36, 0.3);
-  border-left: 3px solid #fbbf24;
-  color: #fbbf24;
-  line-height: 1.8;
-  font-weight: 500;
+  background: transparent;
+  padding: 16px 20px;
+  border-radius: 8px;
+  border: 1px solid rgba(248, 113, 113, 0.25);
+  border-left: 3px solid var(--signal-red);
+  color: var(--text-body);
+  line-height: 1.7;
+  font-weight: 400;
+  font-size: 15px;
 }
 
 .sources-list {
   list-style: none;
   padding: 0;
+  margin: 0;
 }
 
 .sources-list li {
-  margin-bottom: 1rem;
+  margin: 0;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.sources-list li:last-child {
+  border-bottom: none;
 }
 
 .sources-list a {
-  color: var(--accent);
+  color: var(--text-body);
   text-decoration: none;
   word-break: break-all;
   display: inline-flex;
   align-items: center;
-  gap: 0.75rem;
-  transition: all 0.3s ease;
-  padding: 0.5rem 0;
+  gap: 10px;
+  transition: color 0.2s ease;
+  padding: 0;
+  font-size: 14px;
+  line-height: 1.5;
 }
 
 .sources-list a::before {
-  content: '🌐';
-  font-size: 1.2rem;
+  content: '→';
+  color: var(--text-dim);
+  font-size: 14px;
+  flex-shrink: 0;
 }
 
 .sources-list a:hover {
-  color: white;
-  text-decoration: underline;
-  transform: translateX(5px);
+  color: var(--gold);
+  text-decoration: none;
+  transform: none;
 }
 
 .detail-footer {
-  margin-top: 2.5rem;
-  padding-top: 2rem;
-  border-top: 1px solid var(--border);
+  margin-top: 36px;
+  padding-top: 0;
+  border-top: none;
 }
 
 .detail-meta {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.75rem;
-  flex-wrap: wrap;
-  gap: 1rem;
+  display: none; /* category/date already shown up top */
 }
 
-.category-badge {
-  background: rgba(198, 166, 91, 0.2);
-  color: var(--accent);
-  border: 1px solid rgba(198, 166, 91, 0.4);
-  padding: 0.6rem 1.4rem;
-  border-radius: 24px;
-  font-size: 0.9rem;
-  font-weight: 700;
-  text-transform: capitalize;
-}
-
+.category-badge,
 .last-updated {
-  color: var(--text-light);
-  font-size: 0.9rem;
-  opacity: 0.8;
+  display: none;
 }
 
 .disclaimer-box {
-  background: rgba(30, 58, 95, 0.3);
-  padding: 1.5rem;
-  border-radius: 12px;
-  border-left: 3px solid var(--text-light);
-  color: var(--text-light);
-  font-size: 0.95rem;
-  line-height: 1.7;
-  border: 1px solid var(--border);
+  background: transparent;
+  padding: 16px 0;
+  border-radius: 0;
+  border: none;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  color: var(--text-dim);
+  font-size: 13px;
+  line-height: 1.65;
 }
 
 .disclaimer-box strong {
-  color: white;
-  margin-right: 0.5rem;
-  font-weight: 700;
+  color: var(--text-body);
+  margin-right: 4px;
+  font-weight: 600;
 }
 
 @media (max-width: 768px) {
-  .law-detail-card {
-    padding: 2rem;
+  .law-details-section .container {
+    padding: 0 24px;
   }
 
-  .detail-title {
-    font-size: 1.6rem;
+  .detail-summary p,
+  .detail-content p {
+    font-size: 16px;
   }
 
-  .details-section-title {
-    font-size: 2rem;
-  }
-
-  .detail-meta {
-    flex-direction: column;
-    align-items: flex-start;
+  .detail-conditions {
+    padding-left: 18px;
   }
 
   .detail-conditions li {
-    padding: 1rem 1.25rem;
-  }
-
-  .detail-summary h4,
-  .detail-content h4,
-  .detail-conditions h4,
-  .detail-penalties h4,
-  .detail-sources h4 {
-    font-size: 1.1rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .law-detail-card {
-    padding: 1.5rem;
-  }
-
-  .detail-title {
-    font-size: 1.4rem;
-  }
-
-  .details-section-title {
-    font-size: 1.8rem;
+    font-size: 15px;
   }
 }

@@ -42,17 +42,39 @@ const languageInstructions = {
   es: "Escribe todas las respuestas en español. Usa terminología legal clara y profesional, adecuada para lectores hispanohablantes."
 };
 
-const MODEL = "gemini-2.5-flash";
+const MODELS = ["gemini-2.5-flash", "gemini-2.5-flash-lite"];
+const MAX_RETRIES_PER_MODEL = 2;
+
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+const isTransient = (err) => {
+  const msg = (err && (err.message || String(err))) || '';
+  return /\b(429|500|502|503|504|UNAVAILABLE|RESOURCE_EXHAUSTED)\b/.test(msg);
+};
 
 const generateJSON = async (prompt) => {
-  const response = await ai.models.generateContent({
-    model: MODEL,
-    contents: prompt,
-    config: {
-      responseMimeType: "application/json",
-    },
-  });
-  return response.text;
+  let lastError;
+  for (const model of MODELS) {
+    for (let attempt = 0; attempt < MAX_RETRIES_PER_MODEL; attempt++) {
+      try {
+        const response = await ai.models.generateContent({
+          model,
+          contents: prompt,
+          config: {
+            responseMimeType: "application/json",
+          },
+        });
+        return response.text;
+      } catch (err) {
+        lastError = err;
+        if (!isTransient(err)) throw err;
+        const backoff = 400 * Math.pow(2, attempt);
+        console.warn(`[${model}] transient error, retrying in ${backoff}ms...`);
+        await sleep(backoff);
+      }
+    }
+  }
+  throw lastError;
 };
 
 // --- Phase 1: 핵심 법률 정보 (빠른 응답) ---
