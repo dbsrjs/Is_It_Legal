@@ -36,11 +36,11 @@ const languageInstructions = {
   es: "Escribe todas las respuestas en español. Usa terminología legal clara y profesional, adecuada para lectores hispanohablantes."
 };
 
-// Phase 1: 상태 판정과 출처 URL 정확도가 중요하므로 기본 모델을 사용한다.
-const PHASE1_MODELS = ["gemini-3.5-flash"];
-// Phase 2: 국가당 한 문장 요약이라 경량 모델로 충분하다.
-// 경량 모델이 응답하지 못하면 기본 모델로 넘어간다.
-const PHASE2_MODELS = ["gemini-3.5-flash-lite", "gemini-3.5-flash"];
+// 앞에서부터 순서대로 시도하고, 실패하면 다음 모델로 넘어간다.
+// 경량 모델을 1순위로 두는 이유: 기본 모델은 응답에 25~90초가 걸리고
+// 503 과 응답 잘림이 잦아 실사용에서 결과를 내지 못하는 경우가 많다.
+// 기본 모델은 경량 모델이 실패할 때를 대비한 예비 경로로 남겨둔다.
+const MODELS = ["gemini-3.5-flash-lite", "gemini-3.5-flash"];
 const MAX_RETRIES_PER_MODEL = 2;
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -50,7 +50,7 @@ const isTransient = (err) => {
   return /\b(429|500|502|503|504|UNAVAILABLE|RESOURCE_EXHAUSTED)\b/.test(msg);
 };
 
-const generateJSON = async (prompt, models = PHASE1_MODELS) => {
+const generateJSON = async (prompt, models = MODELS) => {
   let lastError;
   for (const model of models) {
     for (let attempt = 0; attempt < MAX_RETRIES_PER_MODEL; attempt++) {
@@ -171,7 +171,7 @@ Rules:
 2. relatedSearches: same topic in other countries, or related topics in same country
 3. Be concise - one sentence per country summary`;
 
-    const text = await generateJSON(prompt, PHASE2_MODELS);
+    const text = await generateJSON(prompt);
 
     let data;
     try {

@@ -17,8 +17,9 @@
 ### 2. AI 기반 법률 검색
 - **Gemini API** REST 호출을 통한 법률 정보 분석 (Cloudflare Pages Function 경유)
 - 모델 (JSON 응답 모드)
-  - Phase 1 (핵심 법률 정보): `gemini-3.5-flash` — 상태 판정 및 출처 정확도 우선
-  - Phase 2 (국가 비교/관련 검색어): `gemini-3.5-flash-lite` — 응답 속도 우선, 실패 시 `gemini-3.5-flash`로 폴백
+  - 1순위 `gemini-3.5-flash-lite` (약 2~3초), 실패 시 2순위 `gemini-3.5-flash`로 폴백
+  - `gemini-3.5-flash`는 응답에 25~90초가 걸리고 503·응답 잘림이 잦아 예비 경로로만 사용
+  - 알려진 한계: 경량 모델은 존재하지 않는 정부 URL을 `sources`에 넣는 경우가 있음
   - 모델 변경 시 `src/services/aiService.js`와 `functions/api/gemini.js`의 화이트리스트를 함께 수정해야 함
 - 실시간 법률 상태 분류 (합법/조건부 합법/불법/불명확)
 - 상세한 법률 설명 및 근거 제시
