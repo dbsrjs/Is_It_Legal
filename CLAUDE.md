@@ -15,7 +15,7 @@
 - 동적 document.title 및 meta description 언어별 업데이트
 
 ### 2. AI 기반 법률 검색
-- **Gemini API** (`@google/generative-ai`)를 활용한 법률 정보 분석
+- **Gemini API** REST 호출을 통한 법률 정보 분석 (Cloudflare Pages Function 경유)
 - 모델: `gemini-3-flash-preview` (JSON 응답 모드)
 - 실시간 법률 상태 분류 (합법/조건부 합법/불법/불명확)
 - 상세한 법률 설명 및 근거 제시
@@ -68,7 +68,8 @@
 - **Inter Font** - 웹 폰트
 
 ### Backend/API
-- **Gemini API** (`@google/generative-ai`) - AI 법률 분석
+- **Cloudflare Pages Functions** - `/api/gemini` 프록시 (API 키 서버 측 보관)
+- **Gemini API** (REST `generateContent`) - AI 법률 분석
 
 ### 배포 & 인프라
 - **Cloudflare Pages** - 정적 사이트 호스팅
@@ -83,6 +84,9 @@
 
 ```
 Is_It_Legal/
+├── functions/
+│   └── api/
+│       └── gemini.js        # Cloudflare Pages Function (Gemini API 프록시, 키 보관)
 ├── public/
 │   ├── index.html           # 메인 HTML (SEO 메타 태그, JSON-LD 포함)
 │   ├── sitemap.xml          # 사이트맵 (25+ URL, 다국어 hreflang)
@@ -118,7 +122,8 @@ Is_It_Legal/
 │   ├── App.js                         # 메인 앱 컴포넌트
 │   ├── App.css                        # 글로벌 스타일
 │   └── index.js                       # 엔트리 포인트
-├── .env                               # 환경 변수 (Gemini API 키)
+├── .dev.vars.example                  # 로컬 Pages Function 환경 변수 예시
+├── package-lock.json                  # 의존성 버전 고정 (삭제 금지)
 └── package.json                       # 프로젝트 의존성
 ```
 
@@ -208,13 +213,25 @@ Is_It_Legal/
 
 ## 환경 변수 설정
 
-`.env` 파일에 다음 변수를 설정해야 합니다 (프로젝트 루트에 위치):
+Gemini API 키는 **서버 측 환경 변수**로만 사용합니다. 브라우저 번들에는 포함되지 않습니다.
 
-```env
-REACT_APP_GEMINI_API_KEY=your_gemini_api_key_here
+### 운영 (Cloudflare Pages)
+Cloudflare Pages 대시보드 > Settings > Environment variables 에 다음을 **Secret** 타입으로 등록합니다 (Production / Preview 각각).
+
+```
+GEMINI_API_KEY=your_gemini_api_key_here
 ```
 
-> **주의**: `.env` 파일은 반드시 프로젝트 루트(`Is_It_Legal/`)에 위치해야 합니다. `src/` 폴더 안에 두면 인식되지 않습니다.
+### 로컬 개발
+`.dev.vars.example`을 `.dev.vars`로 복사한 뒤 키를 채웁니다.
+
+```bash
+cp .dev.vars.example .dev.vars
+npm run build
+npx wrangler pages dev build
+```
+
+> **주의**: `REACT_APP_` 접두사가 붙은 변수는 빌드 시 JS 번들에 문자열로 그대로 삽입되어 누구나 열람할 수 있습니다. API 키를 `REACT_APP_GEMINI_API_KEY`로 설정하면 안 됩니다. CRA 개발 서버(`npm start`)는 `/api/gemini`를 제공하지 않으므로, AI 검색 동작 확인에는 위의 `wrangler pages dev`를 사용합니다.
 
 ## 설치 및 실행
 

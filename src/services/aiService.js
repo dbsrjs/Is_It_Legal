@@ -1,12 +1,6 @@
-import { GoogleGenAI } from "@google/genai";
-
-const API_KEY = process.env.REACT_APP_GEMINI_API_KEY;
-
-if (!API_KEY) {
-  console.error("API Key is missing! Check your .env file.");
-}
-
-const ai = new GoogleGenAI({ apiKey: API_KEY });
+// AI 호출은 서버(Cloudflare Pages Function)를 경유한다.
+// API 키는 브라우저 번들에 포함되지 않는다.
+const API_ENDPOINT = '/api/gemini';
 
 // --- 캐시 시스템 ---
 const CACHE_KEY_PREFIX = 'legal_cache_';
@@ -57,14 +51,18 @@ const generateJSON = async (prompt) => {
   for (const model of MODELS) {
     for (let attempt = 0; attempt < MAX_RETRIES_PER_MODEL; attempt++) {
       try {
-        const response = await ai.models.generateContent({
-          model,
-          contents: prompt,
-          config: {
-            responseMimeType: "application/json",
-          },
+        const response = await fetch(API_ENDPOINT, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompt, model }),
         });
-        return response.text;
+
+        if (!response.ok) {
+          throw new Error(`Request failed (${response.status})`);
+        }
+
+        const { text } = await response.json();
+        return text;
       } catch (err) {
         lastError = err;
         if (!isTransient(err)) throw err;
@@ -192,12 +190,18 @@ Rules:
 
 const getErrorMessage = (error) => {
   const msg = error.message || '';
-  if (msg.includes('404')) {
+  if (msg.includes('403')) {
+    return 'AI service is currently unavailable. The API key or its project may be suspended.';
+  } else if (msg.includes('404')) {
     return 'AI Model not found (404). Please check the model name in aiService.js.';
   } else if (msg.includes('400')) {
-    return 'Invalid Request (400). Please check your API Key or Prompt.';
+    return 'Invalid Request (400). Please check the prompt or the requested model.';
+  } else if (msg.includes('413')) {
+    return 'Your query is too long. Please shorten it and try again.';
   } else if (msg.includes('429')) {
     return 'Too many requests. Please wait a moment.';
+  } else if (/\b(500|502|503|504)\b/.test(msg)) {
+    return 'AI service is temporarily unavailable. Please try again shortly.';
   }
   return 'Failed to fetch information.';
 };
