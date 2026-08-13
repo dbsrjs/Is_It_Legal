@@ -6,7 +6,7 @@
 
 const UPSTREAM_BASE = 'https://generativelanguage.googleapis.com/v1beta/models';
 
-const ALLOWED_MODELS = new Set(['gemini-3.5-flash']);
+const ALLOWED_MODELS = new Set(['gemini-3.5-flash', 'gemini-3.5-flash-lite']);
 const MAX_PROMPT_LENGTH = 8000;
 
 const json = (body, status = 200) =>

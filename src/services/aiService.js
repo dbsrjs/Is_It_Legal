@@ -36,7 +36,11 @@ const languageInstructions = {
   es: "Escribe todas las respuestas en español. Usa terminología legal clara y profesional, adecuada para lectores hispanohablantes."
 };
 
-const MODELS = ["gemini-3.5-flash"];
+// Phase 1: 상태 판정과 출처 URL 정확도가 중요하므로 기본 모델을 사용한다.
+const PHASE1_MODELS = ["gemini-3.5-flash"];
+// Phase 2: 국가당 한 문장 요약이라 경량 모델로 충분하다.
+// 경량 모델이 응답하지 못하면 기본 모델로 넘어간다.
+const PHASE2_MODELS = ["gemini-3.5-flash-lite", "gemini-3.5-flash"];
 const MAX_RETRIES_PER_MODEL = 2;
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -46,9 +50,9 @@ const isTransient = (err) => {
   return /\b(429|500|502|503|504|UNAVAILABLE|RESOURCE_EXHAUSTED)\b/.test(msg);
 };
 
-const generateJSON = async (prompt) => {
+const generateJSON = async (prompt, models = PHASE1_MODELS) => {
   let lastError;
-  for (const model of MODELS) {
+  for (const model of models) {
     for (let attempt = 0; attempt < MAX_RETRIES_PER_MODEL; attempt++) {
       try {
         const response = await fetch(API_ENDPOINT, {
@@ -65,7 +69,8 @@ const generateJSON = async (prompt) => {
         return text;
       } catch (err) {
         lastError = err;
-        if (!isTransient(err)) throw err;
+        // 재시도로 해결되지 않는 오류는 이 모델을 포기하고 다음 모델로 넘어간다.
+        if (!isTransient(err)) break;
         const backoff = 400 * Math.pow(2, attempt);
         console.warn(`[${model}] transient error, retrying in ${backoff}ms...`);
         await sleep(backoff);
@@ -166,7 +171,7 @@ Rules:
 2. relatedSearches: same topic in other countries, or related topics in same country
 3. Be concise - one sentence per country summary`;
 
-    const text = await generateJSON(prompt);
+    const text = await generateJSON(prompt, PHASE2_MODELS);
 
     let data;
     try {
