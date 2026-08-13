@@ -45,6 +45,53 @@ const MAX_RETRIES_PER_MODEL = 2;
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
+// 모델이 JSON 앞뒤에 설명을 덧붙이거나 닫는 괄호를 하나 더 붙여 보내는 경우가 있다.
+// 첫 '{' 부터 짝이 맞는 '}' 까지만 잘라내어 파싱한다.
+// 괄호가 끝까지 닫히지 않으면(응답이 잘린 경우) 예외를 던져 다음 모델로 넘어가게 한다.
+export const extractJSON = (text) => {
+  if (typeof text !== 'string' || text.trim() === '') {
+    throw new Error('Empty AI response');
+  }
+
+  const start = text.indexOf('{');
+  if (start === -1) {
+    throw new Error('No JSON object in AI response');
+  }
+
+  let depth = 0;
+  let inString = false;
+  let escaped = false;
+
+  for (let i = start; i < text.length; i++) {
+    const ch = text[i];
+
+    if (escaped) {
+      escaped = false;
+      continue;
+    }
+    if (ch === '\\') {
+      escaped = true;
+      continue;
+    }
+    if (ch === '"') {
+      inString = !inString;
+      continue;
+    }
+    if (inString) continue;
+
+    if (ch === '{') {
+      depth++;
+    } else if (ch === '}') {
+      depth--;
+      if (depth === 0) {
+        return JSON.parse(text.slice(start, i + 1));
+      }
+    }
+  }
+
+  throw new Error('Incomplete JSON in AI response');
+};
+
 const isTransient = (err) => {
   const msg = (err && (err.message || String(err))) || '';
   return /\b(429|500|502|503|504|UNAVAILABLE|RESOURCE_EXHAUSTED)\b/.test(msg);
@@ -66,7 +113,9 @@ const generateJSON = async (prompt, models = MODELS) => {
         }
 
         const { text } = await response.json();
-        return text;
+        // 파싱까지 여기서 끝낸다. 호출부에서 파싱하면 응답이 깨졌을 때
+        // 다음 모델로 폴백하지 못하고 그대로 오류가 된다.
+        return extractJSON(text);
       } catch (err) {
         lastError = err;
         // 재시도로 해결되지 않는 오류는 이 모델을 포기하고 다음 모델로 넘어간다.
@@ -113,15 +162,7 @@ Rules:
 4. Be objective and factual
 5. conditions: empty array if status is "legal" or "illegal"`;
 
-    const text = await generateJSON(prompt);
-
-    let legalInfo;
-    try {
-      legalInfo = JSON.parse(text);
-    } catch (e) {
-      console.error("JSON Parse Error:", text);
-      throw new Error("Failed to parse AI response as JSON");
-    }
+    const legalInfo = await generateJSON(prompt);
 
     legalInfo.id = Date.now();
     legalInfo.category = getCategoryFromTopic(legalInfo.topic);
@@ -171,15 +212,7 @@ Rules:
 2. relatedSearches: same topic in other countries, or related topics in same country
 3. Be concise - one sentence per country summary`;
 
-    const text = await generateJSON(prompt);
-
-    let data;
-    try {
-      data = JSON.parse(text);
-    } catch (e) {
-      console.error("Comparisons JSON Parse Error:", text);
-      throw new Error("Failed to parse comparisons response");
-    }
+    const data = await generateJSON(prompt);
 
     try { sessionStorage.setItem(cacheKey, JSON.stringify(data)); } catch {}
 
