@@ -36,7 +36,7 @@ const languageInstructions = {
   es: "Escribe todas las respuestas en español. Usa terminología legal clara y profesional, adecuada para lectores hispanohablantes."
 };
 
-const MODELS = ["gemini-3.5-flash"];
+const MODELS = ["gemini-3.5-flash-lite"];
 const MAX_RETRIES_PER_MODEL = 2;
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
