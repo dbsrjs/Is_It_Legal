@@ -8,6 +8,7 @@ const UPSTREAM_BASE = 'https://generativelanguage.googleapis.com/v1beta/models';
 
 const ALLOWED_MODELS = new Set(['gemini-3.5-flash', 'gemini-3.5-flash-lite']);
 const MAX_PROMPT_LENGTH = 8000;
+const MAX_OUTPUT_TOKENS = 8192;
 
 const json = (body, status = 200) =>
   new Response(JSON.stringify(body), {
@@ -79,7 +80,10 @@ export async function onRequestPost({ request, env }) {
       },
       body: JSON.stringify({
         contents: [{ role: 'user', parts: [{ text: prompt }] }],
-        generationConfig: { responseMimeType: 'application/json' },
+        generationConfig: {
+          responseMimeType: 'application/json',
+          maxOutputTokens: MAX_OUTPUT_TOKENS,
+        },
       }),
     });
   } catch {
@@ -97,6 +101,14 @@ export async function onRequestPost({ request, env }) {
     result = await upstream.json();
   } catch {
     return json({ error: 'Malformed upstream response' }, 502);
+  }
+
+  // MAX_TOKENS 등으로 중간에 끊긴 응답은 JSON 이 닫히지 않아 파싱이 불가능하다.
+  // 200 으로 내려보내면 클라이언트에서 파싱 오류로만 보이고 폴백도 되지 않으므로,
+  // 여기서 실패로 처리해 다음 모델로 넘어가게 한다.
+  const finishReason = result?.candidates?.[0]?.finishReason;
+  if (finishReason && finishReason !== 'STOP') {
+    return json({ error: `Incomplete response (${finishReason})` }, 502);
   }
 
   const text = extractText(result);
